@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{layout/fragmentos :: head('EasySpot AI', 'landing')}"></head>
+
+    <body class="landing-page">
+        <header th:replace="~{layout/fragmentos :: publicNavbar}"></header>
+
+        <main>
+            <section class="hero-section">
+                <div class="hero-glow hero-glow-one"></div>
+                <div class="hero-glow hero-glow-two"></div>
+
+                <div class="hero-container">
+                    <div class="hero-content">
+                        <span class="hero-badge">
+                            <i class="fa-solid fa-location-dot"></i>
+                            Smart Parking Experience
+                        </span>
+
+                        <h1>
+                            Parquea más rápido.
+                            <span>Muévete mejor.</span>
+                        </h1>
+
+                        <p>
+                            EasySpot AI conecta conductores con espacios de parqueo disponibles,
+                            reservas inteligentes y reportes comunitarios en tiempo real.
+                        </p>
+
+                        <div class="hero-actions">
+                            <a th:href="@{/registro}" class="hero-primary-btn">
+                                Comenzar ahora
+                            </a>
+
+                            <a th:href="@{/login}" class="hero-secondary-btn">
+                                Iniciar sesión
+                            </a>
+                        </div>
+
+                        <div class="hero-metrics">
+                            <div>
+                                <strong>92%</strong>
+                                <span>Precisión IA</span>
+                            </div>
+
+                            <div>
+                                <strong>12 min</strong>
+                                <span>Ahorro promedio</span>
+                            </div>
+
+                            <div>
+                                <strong>324</strong>
+                                <span>Espacios monitoreados</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hero-visual">
+                        <div class="phone-mockup">
+                            <div class="phone-top"></div>
+
+                            <div class="map-card">
+                                <div class="map-grid"></div>
+
+                                <div class="parking-pin pin-green">
+                                    <i class="fa-solid fa-p"></i>
+                                </div>
+
+                                <div class="parking-pin pin-yellow">
+                                    <i class="fa-solid fa-p"></i>
+                                </div>
+
+                                <div class="parking-pin pin-red">
+                                    <i class="fa-solid fa-p"></i>
+                                </div>
+
+                                <div class="floating-route">
+                                    <span>Mejor opción</span>
+                                    <strong>Parqueo Central Heredia</strong>
+                                    <small>18 espacios · 3 min</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="floating-ai-card">
+                            <span>EasySpot AI</span>
+                            <strong>Score 94</strong>
+                            <p>Alta probabilidad de espacio disponible.</p>
+                        </div>
+
+                        <div class="floating-reserve-card">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <div>
+                                <strong>Reserva lista</strong>
+                                <span>Espacio #18 asignado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="features-section">
+                <div class="section-heading">
+                    <span>Funciones principales</span>
+                    <h2>Una experiencia de parqueo más inteligente</h2>
+                </div>
+
+                <div class="features-grid">
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <h3>Predicción inteligente</h3>
+                        <p>Analiza disponibilidad, hora, zona y demanda para recomendar el mejor parqueo.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                        <h3>Reservas anticipadas</h3>
+                        <p>Permite apartar un espacio antes de llegar y reducir la incertidumbre.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <h3>Reportes comunitarios</h3>
+                        <p>Los usuarios actualizan el estado de los parqueos en tiempo real.</p>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <div th:replace="~{layout/fragmentos :: scripts}"></div>
+    </body>
+</html>

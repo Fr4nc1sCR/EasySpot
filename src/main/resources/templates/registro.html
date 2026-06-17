@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{layout/fragmentos :: head('Registro | EasySpot AI', 'auth')}"></head>
+
+    <body class="auth-page">
+        <main class="auth-container">
+            <section class="auth-info">
+                <a th:href="@{/}" class="auth-logo">
+                    EasySpot <span>AI</span>
+                    <small>Smart Parking Platform</small>
+                </a>
+
+                <h1>Crea tu cuenta inteligente.</h1>
+
+                <p>
+                    Únete a EasySpot AI y empieza a encontrar parqueos disponibles,
+                    reservar espacios y aportar reportes comunitarios.
+                </p>
+
+                <div class="auth-benefits">
+                    <div>📍 Encuentra parqueos cercanos</div>
+                    <div>📊 Consulta ocupación</div>
+                    <div>🌱 Reduce tiempo y combustible</div>
+                </div>
+            </section>
+
+            <section class="auth-card">
+                <span class="auth-badge">Nueva cuenta</span>
+
+                <h2>Registrarse</h2>
+                <p>Crea una cuenta para utilizar EasySpot AI.</p>
+                
+                <div th:if="${error}" class="auth-message error" th:text="${error}"></div>
+
+                <form th:action="@{/registro}" method="post" class="auth-form">
+                    <div class="auth-field">
+                        <label>Nombre completo</label>
+                        <input type="text" name="nombre" placeholder="Tu nombre" required>
+                    </div>
+
+                    <div class="auth-field">
+                        <label>Correo electrónico</label>
+                        <input type="email" name="email" placeholder="correo@ejemplo.com" required>
+                    </div>
+
+                    <div class="auth-field">
+                        <label>Contraseña</label>
+                        <input type="password" name="password" placeholder="Crea una contraseña" required>
+                    </div>
+
+                    <div class="auth-field">
+                        <label>Confirmar contraseña</label>
+                        <input type="password" name="confirmPassword" placeholder="Repite la contraseña" required>
+                    </div>
+
+                    <button type="submit" class="auth-submit">
+                        Crear cuenta
+                    </button>
+                </form>
+
+                <div class="auth-link">
+                    ¿Ya tienes cuenta?
+                    <a th:href="@{/login}">Inicia sesión</a>
+                </div>
+
+                <a th:href="@{/}" class="auth-back">← Volver al inicio</a>
+            </section>
+        </main>
+
+        <div th:replace="~{layout/fragmentos :: scripts}"></div>
+    </body>
+</html>

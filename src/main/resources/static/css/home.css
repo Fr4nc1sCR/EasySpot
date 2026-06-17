@@ -1,0 +1,308 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 16 jun 2026, 5:25:59 p. m.
+    Author     : XPC
+*/
+
+.home-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 15% 10%, rgba(6, 182, 212, 0.16), transparent 26%),
+        radial-gradient(circle at 90% 15%, rgba(37, 99, 235, 0.14), transparent 28%),
+        #f8fafc;
+}
+
+.home-container {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.home-hero {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: center;
+    padding: 2.5rem;
+    border-radius: 2rem;
+    color: white;
+    background:
+        radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.25), transparent 30%),
+        linear-gradient(135deg, #020617, #0f172a);
+    box-shadow: 0 25px 70px rgba(15, 23, 42, 0.22);
+}
+
+.home-badge,
+.home-section-title span,
+.home-ai-card > span {
+    display: inline-flex;
+    width: fit-content;
+    padding: 0.5rem 0.75rem;
+    border-radius: 999px;
+    background: #cffafe;
+    color: #0891b2;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 950;
+}
+
+.home-badge,
+.home-ai-card > span {
+    background: rgba(103, 232, 249, 0.15);
+    color: #67e8f9;
+}
+
+.home-hero h1 {
+    margin-top: 1rem;
+    max-width: 850px;
+    font-size: clamp(2.5rem, 5vw, 4.8rem);
+    line-height: 1;
+    font-weight: 950;
+}
+
+.home-hero h1 strong {
+    color: #67e8f9;
+}
+
+.home-hero p {
+    margin-top: 1rem;
+    color: #cbd5e1;
+    max-width: 650px;
+    line-height: 1.8;
+}
+
+.home-actions {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.home-primary-btn,
+.home-secondary-btn {
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+    font-weight: 950;
+    text-align: center;
+    transition: 0.25s ease;
+}
+
+.home-primary-btn {
+    background: #06b6d4;
+    color: white;
+}
+
+.home-secondary-btn {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.home-primary-btn:hover,
+.home-secondary-btn:hover {
+    transform: translateY(-3px);
+}
+
+.home-ai-card {
+    background: rgba(255, 255, 255, 0.09);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 1.75rem;
+    padding: 1.75rem;
+    backdrop-filter: blur(18px);
+}
+
+.home-ai-card h2 {
+    margin-top: 1rem;
+    font-size: 2rem;
+    font-weight: 950;
+}
+
+.home-ai-card h3 {
+    margin-top: 1rem;
+    font-size: 1.3rem;
+    font-weight: 950;
+}
+
+.home-ai-score {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    border-radius: 1.25rem;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.home-ai-score strong {
+    display: block;
+    color: #67e8f9;
+    font-size: 3rem;
+    font-weight: 950;
+}
+
+.home-ai-score small {
+    color: #cbd5e1;
+}
+
+.home-stats {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.home-stat-card,
+.home-panel,
+.home-side-panel {
+    background: white;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.06);
+}
+
+.home-stat-card {
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+}
+
+.home-stat-card span {
+    font-size: 2rem;
+}
+
+.home-stat-card strong {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 2rem;
+    color: #020617;
+    font-weight: 950;
+}
+
+.home-stat-card p {
+    margin-top: 0.25rem;
+    color: #64748b;
+}
+
+.home-grid {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.home-panel,
+.home-side-panel {
+    border-radius: 1.75rem;
+    padding: 1.75rem;
+}
+
+.home-section-title h2 {
+    margin-top: 0.75rem;
+    color: #020617;
+    font-size: 2rem;
+    font-weight: 950;
+}
+
+.quick-actions-grid {
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.quick-action-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 1.5rem;
+    padding: 1.25rem;
+    transition: 0.25s ease;
+}
+
+.quick-action-card:hover {
+    transform: translateY(-5px);
+    border-color: #22d3ee;
+    background: #ecfeff;
+}
+
+.quick-action-card div {
+    font-size: 2rem;
+}
+
+.quick-action-card h3 {
+    margin-top: 0.75rem;
+    color: #020617;
+    font-size: 1.25rem;
+    font-weight: 950;
+}
+
+.quick-action-card p {
+    margin-top: 0.5rem;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.activity-list {
+    margin-top: 1.5rem;
+    display: grid;
+    gap: 1rem;
+}
+
+.activity-item {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    background: #f8fafc;
+    border-radius: 1.25rem;
+    border: 1px solid #e2e8f0;
+    padding: 1rem;
+}
+
+.activity-item span {
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
+    border-radius: 1rem;
+    background: #ecfeff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.activity-item strong {
+    color: #020617;
+    font-weight: 950;
+}
+
+.activity-item p {
+    margin-top: 0.25rem;
+    color: #64748b;
+}
+
+@media (min-width: 768px) {
+    .home-actions {
+        flex-direction: row;
+    }
+
+    .home-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .quick-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1200px) {
+    .home-hero {
+        grid-template-columns: 1.2fr 0.8fr;
+    }
+
+    .home-stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .home-grid {
+        grid-template-columns: 1.4fr 0.8fr;
+    }
+}

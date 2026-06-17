@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{layout/fragmentos :: head('Dashboard | EasySpot AI', 'dashboard')}"></head>
+
+    <body class="dashboard-page">
+
+        <header th:replace="~{layout/fragmentos :: appNavbar}"></header>
+
+        <main class="dashboard-container">
+
+            <section class="dashboard-hero">
+                <div>
+                    <span class="dashboard-badge">Dashboard inteligente</span>
+                    <h1>Encuentra el mejor parqueo en segundos.</h1>
+                    <p>
+                        Visualiza disponibilidad, predice ocupación y reserva espacios
+                        usando la información de EasySpot AI.
+                    </p>
+                </div>
+
+                <form class="dashboard-search">
+                    <input type="text" placeholder="Buscar destino, zona o parqueo...">
+                    <button type="button">Buscar con IA</button>
+                </form>
+            </section>
+
+            <section class="dashboard-stats">
+                <div class="stat-card">
+                    <span>🅿️</span>
+                    <strong>324</strong>
+                    <p>Espacios disponibles</p>
+                </div>
+
+                <div class="stat-card">
+                    <span>📍</span>
+                    <strong>18</strong>
+                    <p>Parqueos monitoreados</p>
+                </div>
+
+                <div class="stat-card">
+                    <span>🤖</span>
+                    <strong>92%</strong>
+                    <p>Precisión IA</p>
+                </div>
+
+                <div class="stat-card">
+                    <span>⏱️</span>
+                    <strong>12 min</strong>
+                    <p>Tiempo ahorrado</p>
+                </div>
+            </section>
+
+            <section class="dashboard-grid">
+
+                <aside class="parking-panel">
+                    <span class="panel-badge">Opciones cercanas</span>
+                    <h2>Parqueos disponibles</h2>
+
+                    <div class="parking-list">
+                        <article class="parking-card active">
+                            <div>
+                                <h3>Parqueo Central Heredia</h3>
+                                <p>Heredia Centro</p>
+                            </div>
+                            <span>94/100</span>
+                            <ul>
+                                <li>🅿️ 18 espacios</li>
+                                <li>💵 ₡1200</li>
+                                <li>🚶 3 min</li>
+                                <li>🛡️ Alta</li>
+                            </ul>
+                        </article>
+
+                        <article class="parking-card">
+                            <div>
+                                <h3>Parqueo Mall San Pedro</h3>
+                                <p>San Pedro</p>
+                            </div>
+                            <span>86/100</span>
+                            <ul>
+                                <li>🅿️ 8 espacios</li>
+                                <li>💵 ₡1500</li>
+                                <li>🚶 5 min</li>
+                                <li>🛡️ Media</li>
+                            </ul>
+                        </article>
+
+                        <article class="parking-card">
+                            <div>
+                                <h3>Parqueo Avenida Segunda</h3>
+                                <p>San José Centro</p>
+                            </div>
+                            <span>72/100</span>
+                            <ul>
+                                <li>🅿️ 4 espacios</li>
+                                <li>💵 ₡1000</li>
+                                <li>🚶 7 min</li>
+                                <li>🛡️ Media</li>
+                            </ul>
+                        </article>
+                    </div>
+                </aside>
+
+                <section class="map-panel">
+                    <span class="panel-badge">Mapa inteligente</span>
+                    <h2>Disponibilidad en tiempo real</h2>
+
+                    <div class="smart-map">
+                        <div class="road road-one"></div>
+                        <div class="road road-two"></div>
+                        <div class="road road-three"></div>
+
+                        <button class="map-pin pin-green">P</button>
+                        <button class="map-pin pin-yellow">P</button>
+                        <button class="map-pin pin-red">P</button>
+
+                        <div class="map-info">
+                            <strong>Parqueo Central Heredia</strong>
+                            <p>18 espacios disponibles · 3 min</p>
+                        </div>
+                    </div>
+
+                    <div class="map-legend">
+                        <span><i class="green"></i> Disponible</span>
+                        <span><i class="yellow"></i> Alta ocupación</span>
+                        <span><i class="red"></i> Saturado</span>
+                    </div>
+                </section>
+
+                <aside class="ai-panel">
+                    <section class="recommendation-card">
+                        <span>EasySpot AI</span>
+                        <h2>Mejor opción encontrada</h2>
+                        <h3>Parqueo Central Heredia</h3>
+                        <p>Heredia Centro</p>
+
+                        <div class="score-box">
+                            <strong>94</strong>
+                            <small>Smart Score</small>
+                        </div>
+
+                        <ul>
+                            <li>✅ Alta probabilidad de encontrar espacio.</li>
+                            <li>✅ Buena relación precio/distancia.</li>
+                            <li>✅ Seguridad calificada como alta.</li>
+                        </ul>
+                    </section>
+
+                    <section class="prediction-card">
+                        <span>Predicción</span>
+                        <h2>Ocupación estimada</h2>
+
+                        <div class="prediction-row">
+                            <div><strong>Ahora</strong><small>70%</small></div>
+                            <div class="bar"><i style="width:70%"></i></div>
+                        </div>
+
+                        <div class="prediction-row">
+                            <div><strong>15 min</strong><small>60%</small></div>
+                            <div class="bar"><i style="width:60%"></i></div>
+                        </div>
+
+                        <div class="prediction-row">
+                            <div><strong>30 min</strong><small>50%</small></div>
+                            <div class="bar"><i style="width:50%"></i></div>
+                        </div>
+
+                        <div class="prediction-row">
+                            <div><strong>45 min</strong><small>38%</small></div>
+                            <div class="bar"><i style="width:38%"></i></div>
+                        </div>
+                    </section>
+
+                    <section class="quick-reserve">
+                        <span>Reserva rápida</span>
+                        <h2>Espacio asignado</h2>
+                        <p>#18 · Heredia Centro</p>
+                        <button>Reservar ahora</button>
+                    </section>
+                </aside>
+
+            </section>
+
+        </main>
+
+        <div th:replace="~{layout/fragmentos :: scripts}"></div>
+
+    </body>
+</html>

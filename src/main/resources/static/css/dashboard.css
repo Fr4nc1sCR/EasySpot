@@ -1,0 +1,459 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 16 jun 2026, 5:26:05 p. m.
+    Author     : XPC
+*/
+
+.dashboard-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 15% 10%, rgba(6, 182, 212, 0.16), transparent 26%),
+        radial-gradient(circle at 90% 15%, rgba(37, 99, 235, 0.14), transparent 28%),
+        #f8fafc;
+}
+
+.dashboard-container {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.dashboard-hero {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: center;
+    padding: 2.5rem;
+    border-radius: 2rem;
+    color: white;
+    background:
+        radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.24), transparent 32%),
+        linear-gradient(135deg, #020617, #0f172a);
+    box-shadow: 0 25px 70px rgba(15, 23, 42, 0.22);
+}
+
+.dashboard-badge,
+.panel-badge,
+.recommendation-card > span,
+.prediction-card > span,
+.quick-reserve > span {
+    display: inline-flex;
+    width: fit-content;
+    padding: 0.5rem 0.75rem;
+    border-radius: 999px;
+    background: #cffafe;
+    color: #0891b2;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 950;
+}
+
+.dashboard-badge {
+    background: rgba(103, 232, 249, 0.15);
+    color: #67e8f9;
+}
+
+.dashboard-hero h1 {
+    margin-top: 1rem;
+    max-width: 750px;
+    font-size: clamp(2.5rem, 5vw, 4.8rem);
+    line-height: 1;
+    font-weight: 950;
+}
+
+.dashboard-hero p {
+    margin-top: 1rem;
+    color: #cbd5e1;
+    max-width: 650px;
+    line-height: 1.8;
+}
+
+.dashboard-search {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.8rem;
+    border-radius: 1.4rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.dashboard-search input {
+    border: none;
+    outline: none;
+    padding: 1rem;
+    border-radius: 1rem;
+    color: #020617;
+}
+
+.dashboard-search button,
+.quick-reserve button {
+    border: none;
+    padding: 1rem;
+    border-radius: 1rem;
+    background: #06b6d4;
+    color: white;
+    font-weight: 950;
+    cursor: pointer;
+}
+
+.dashboard-stats {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.stat-card,
+.parking-panel,
+.map-panel,
+.recommendation-card,
+.prediction-card,
+.quick-reserve {
+    background: white;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.06);
+}
+
+.stat-card {
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+}
+
+.stat-card span {
+    font-size: 2rem;
+}
+
+.stat-card strong {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 2rem;
+    color: #020617;
+    font-weight: 950;
+}
+
+.stat-card p {
+    margin-top: 0.25rem;
+    color: #64748b;
+}
+
+.dashboard-grid {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.parking-panel,
+.map-panel,
+.recommendation-card,
+.prediction-card,
+.quick-reserve {
+    border-radius: 1.75rem;
+    padding: 1.5rem;
+}
+
+.parking-panel h2,
+.map-panel h2,
+.recommendation-card h2,
+.prediction-card h2,
+.quick-reserve h2 {
+    margin-top: 0.75rem;
+    color: #020617;
+    font-size: 1.7rem;
+    font-weight: 950;
+}
+
+.parking-list {
+    margin-top: 1.5rem;
+    display: grid;
+    gap: 1rem;
+}
+
+.parking-card {
+    position: relative;
+    border: 1px solid #e2e8f0;
+    border-radius: 1.25rem;
+    padding: 1rem;
+    background: #f8fafc;
+}
+
+.parking-card.active {
+    border-color: #06b6d4;
+    background: #ecfeff;
+}
+
+.parking-card h3 {
+    font-size: 1rem;
+    color: #020617;
+    font-weight: 950;
+}
+
+.parking-card p {
+    color: #64748b;
+    margin: 0;
+}
+
+.parking-card > span {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #cffafe;
+    color: #0891b2;
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 950;
+}
+
+.parking-card ul {
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    color: #475569;
+    font-size: 0.85rem;
+}
+
+.smart-map {
+    position: relative;
+    margin-top: 1.5rem;
+    height: 480px;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    border: 1px solid #bae6fd;
+    background:
+        radial-gradient(circle at 25% 35%, rgba(34, 197, 94, 0.25), transparent 16%),
+        radial-gradient(circle at 65% 52%, rgba(245, 158, 11, 0.25), transparent 16%),
+        radial-gradient(circle at 42% 78%, rgba(239, 68, 68, 0.22), transparent 16%),
+        linear-gradient(90deg, rgba(14, 165, 233, 0.25) 1px, transparent 1px),
+        linear-gradient(rgba(14, 165, 233, 0.25) 1px, transparent 1px),
+        #e0f2fe;
+    background-size: auto, auto, auto, 52px 52px, 52px 52px, auto;
+}
+
+.road {
+    position: absolute;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.08);
+}
+
+.road-one {
+    width: 80%;
+    height: 18px;
+    top: 38%;
+    left: 8%;
+    transform: rotate(-15deg);
+}
+
+.road-two {
+    width: 70%;
+    height: 18px;
+    top: 62%;
+    left: 16%;
+    transform: rotate(22deg);
+}
+
+.road-three {
+    width: 18px;
+    height: 78%;
+    top: 10%;
+    left: 50%;
+    transform: rotate(8deg);
+}
+
+.map-pin {
+    position: absolute;
+    width: 58px;
+    height: 58px;
+    border-radius: 999px;
+    border: 5px solid white;
+    color: white;
+    font-weight: 950;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.25);
+}
+
+.pin-green {
+    top: 24%;
+    left: 22%;
+    background: #22c55e;
+}
+
+.pin-yellow {
+    top: 48%;
+    right: 25%;
+    background: #f59e0b;
+}
+
+.pin-red {
+    bottom: 18%;
+    left: 38%;
+    background: #ef4444;
+}
+
+.map-info {
+    position: absolute;
+    left: 1.25rem;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    padding: 1rem;
+    border-radius: 1.25rem;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+}
+
+.map-info strong {
+    color: #020617;
+    font-weight: 950;
+}
+
+.map-info p {
+    margin-top: 0.25rem;
+    color: #64748b;
+}
+
+.map-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+    color: #64748b;
+    font-weight: 850;
+}
+
+.map-legend span {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.map-legend i {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+}
+
+.green { background: #22c55e; }
+.yellow { background: #f59e0b; }
+.red { background: #ef4444; }
+
+.ai-panel {
+    display: grid;
+    gap: 1rem;
+}
+
+.recommendation-card {
+    color: white;
+    background: linear-gradient(135deg, #020617, #0f172a);
+}
+
+.recommendation-card h2,
+.recommendation-card h3 {
+    color: white;
+}
+
+.recommendation-card h3 {
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    font-weight: 950;
+}
+
+.recommendation-card p {
+    color: #94a3b8;
+}
+
+.score-box {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 1.25rem;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.score-box strong {
+    color: #67e8f9;
+    font-size: 3rem;
+    font-weight: 950;
+}
+
+.score-box small {
+    display: block;
+    color: #cbd5e1;
+}
+
+.recommendation-card ul {
+    margin-top: 1rem;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.7rem;
+    color: #e2e8f0;
+}
+
+.prediction-row {
+    margin-top: 1rem;
+}
+
+.prediction-row > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    color: #475569;
+}
+
+.bar {
+    margin-top: 0.45rem;
+    height: 10px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #e2e8f0;
+}
+
+.bar i {
+    display: block;
+    height: 100%;
+    background: #06b6d4;
+}
+
+.quick-reserve p {
+    margin-top: 0.5rem;
+    color: #64748b;
+}
+
+.quick-reserve button {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .dashboard-search {
+        flex-direction: row;
+    }
+
+    .dashboard-search input {
+        flex: 1;
+    }
+
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1200px) {
+    .dashboard-hero {
+        grid-template-columns: 1.15fr 0.85fr;
+    }
+
+    .dashboard-stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 330px 1fr 360px;
+    }
+}

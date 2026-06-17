@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{layout/fragmentos :: head('Iniciar sesión | EasySpot AI', 'auth')}"></head>
+
+    <body class="auth-page">
+        <main class="auth-container">
+            <section class="auth-info">
+                <a th:href="@{/}" class="auth-logo">
+                    EasySpot <span>AI</span>
+                    <small>Smart Parking Platform</small>
+                </a>
+
+                <h1>Bienvenido de nuevo.</h1>
+
+                <p>
+                    Accede a tu panel inteligente para encontrar parqueos disponibles,
+                    gestionar reservas y consultar recomendaciones en tiempo real.
+                </p>
+
+                <div class="auth-benefits">
+                    <div>🚗 Predicción de disponibilidad</div>
+                    <div>🅿️ Reservas rápidas</div>
+                    <div>🤖 Recomendaciones inteligentes</div>
+                </div>
+            </section>
+
+            <section class="auth-card">
+                <span class="auth-badge">Acceso seguro</span>
+
+                <h2>Iniciar sesión</h2>
+                <p>Ingresa tus credenciales para continuar.</p>
+
+                <form th:action="@{/login}" method="post" class="auth-form">
+                    <div class="auth-field">
+                        <label>Correo electrónico</label>
+                        <input type="email" name="email" placeholder="correo@ejemplo.com" required>
+                    </div>
+
+                    <div class="auth-field">
+                        <label>Contraseña</label>
+                        <input type="password" name="password" placeholder="Ingresa tu contraseña" required>
+                    </div>
+
+                    <button type="submit" class="auth-submit">
+                        Entrar a EasySpot
+                    </button>
+                </form>
+
+                <div class="auth-link">
+                    ¿No tienes cuenta?
+                    <a th:href="@{/registro}">Regístrate aquí</a>
+                </div>
+
+                <a th:href="@{/}" class="auth-back">← Volver al inicio</a>
+            </section>
+        </main>
+
+        <div th:replace="~{layout/fragmentos :: scripts}"></div>
+    </body>
+</html>

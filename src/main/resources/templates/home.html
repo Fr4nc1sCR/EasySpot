@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{layout/fragmentos :: head('Inicio | EasySpot AI', 'home')}"></head>
+
+    <body class="home-page">
+
+        <header th:replace="~{layout/fragmentos :: appNavbar}"></header>
+
+        <main class="home-container">
+
+            <section class="home-hero">
+                <div>
+                    <span class="home-badge">Panel principal</span>
+
+                    <h1>
+                        Hola,
+                        <strong th:text="${session.usuarioLogueado.nombre}">Usuario</strong>
+                    </h1>
+
+                    <p>
+                        Bienvenido a EasySpot AI. Desde aquí puedes buscar parqueos,
+                        revisar tus reservas, enviar reportes y gestionar tu perfil.
+                    </p>
+
+                    <div class="home-actions">
+                        <a th:href="@{/dashboard}" class="home-primary-btn">Buscar parqueo</a>
+                        <a th:href="@{/reservas}" class="home-secondary-btn">Ver reservas</a>
+                    </div>
+                </div>
+
+                <div class="home-ai-card">
+                    <span>EasySpot AI</span>
+                    <h2>Recomendación rápida</h2>
+                    <h3>Parqueo Central Heredia</h3>
+                    <p>Alta disponibilidad cerca de tu zona frecuente.</p>
+
+                    <div class="home-ai-score">
+                        <strong>94</strong>
+                        <small>Smart Score</small>
+                    </div>
+                </div>
+            </section>
+
+            <section class="home-stats">
+                <div class="home-stat-card">
+                    <span>🅿️</span>
+                    <strong>324</strong>
+                    <p>Espacios disponibles</p>
+                </div>
+
+                <div class="home-stat-card">
+                    <span>📅</span>
+                    <strong>2</strong>
+                    <p>Reservas activas</p>
+                </div>
+
+                <div class="home-stat-card">
+                    <span>📢</span>
+                    <strong>12</strong>
+                    <p>Reportes recientes</p>
+                </div>
+
+                <div class="home-stat-card">
+                    <span>⏱️</span>
+                    <strong>12 min</strong>
+                    <p>Tiempo ahorrado hoy</p>
+                </div>
+            </section>
+
+            <section class="home-grid">
+
+                <section class="home-panel">
+                    <div class="home-section-title">
+                        <span>Accesos rápidos</span>
+                        <h2>¿Qué quieres hacer?</h2>
+                    </div>
+
+                    <div class="quick-actions-grid">
+                        <a th:href="@{/dashboard}" class="quick-action-card">
+                            <div>🔎</div>
+                            <h3>Buscar parqueo</h3>
+                            <p>Encuentra espacios disponibles en tiempo real.</p>
+                        </a>
+
+                        <a th:href="@{/reservas}" class="quick-action-card">
+                            <div>📅</div>
+                            <h3>Mis reservas</h3>
+                            <p>Consulta tus reservas activas e historial.</p>
+                        </a>
+
+                        <a th:href="@{/reportes}" class="quick-action-card">
+                            <div>📢</div>
+                            <h3>Enviar reporte</h3>
+                            <p>Ayuda a otros usuarios con información actualizada.</p>
+                        </a>
+
+                        <a th:href="@{/perfil}" class="quick-action-card">
+                            <div>👤</div>
+                            <h3>Mi perfil</h3>
+                            <p>Gestiona tus datos, vehículos y preferencias.</p>
+                        </a>
+                    </div>
+                </section>
+
+                <aside class="home-side-panel">
+                    <div class="home-section-title">
+                        <span>Actividad</span>
+                        <h2>Resumen reciente</h2>
+                    </div>
+
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <span>✅</span>
+                            <div>
+                                <strong>Reserva confirmada</strong>
+                                <p>Parqueo Central Heredia · Espacio #18</p>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <span>📢</span>
+                            <div>
+                                <strong>Reporte comunitario</strong>
+                                <p>Usuario reportó 3 espacios libres.</p>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <span>🤖</span>
+                            <div>
+                                <strong>Recomendación IA</strong>
+                                <p>Mejor horario para llegar: próximos 15 minutos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+            </section>
+
+        </main>
+
+        <div th:replace="~{layout/fragmentos :: scripts}"></div>
+
+    </body>
+</html>
