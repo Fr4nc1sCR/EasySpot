@@ -1,0 +1,40 @@
+[1mdiff --git a/src/main/resources/application.properties b/src/main/resources/application.properties[m
+[1mindex 174dbd5..d9e1e66 100644[m
+[1m--- a/src/main/resources/application.properties[m
+[1m+++ b/src/main/resources/application.properties[m
+[36m@@ -16,9 +16,9 @@[m [mspring.thymeleaf.cache=false[m
+ # CONEXIÓN MYSQL AIVEN[m
+ # =========================================================[m
+ [m
+[31m-spring.datasource.url=jdbc:mysql://easyspot-easyspot-ai.j.aivencloud.com:22574/easyspot_db?ssl-mode=REQUIRED[m
+[31m-spring.datasource.username=avnadmin[m
+[31m-spring.datasource.password=${DB_PASSWORD}[m
+[32m+[m[32mspring.datasource.url=${AIVEN_DATABASE_URL}[m
+[32m+[m[32mspring.datasource.username=${AIVEN_USERNAME}[m
+[32m+[m[32mspring.datasource.password=${AIVEN_PASSWORD}[m
+ spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver[m
+ [m
+ # =========================================================[m
+[36m@@ -28,8 +28,6 @@[m [mspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver[m
+ spring.jpa.hibernate.ddl-auto=update[m
+ spring.jpa.show-sql=true[m
+ spring.jpa.properties.hibernate.format_sql=true[m
+[31m-[m
+[31m-# Opcional pero recomendado para MySQL[m
+ spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect[m
+ [m
+ # =========================================================[m
+[36m@@ -44,4 +42,10 @@[m [mlogging.level.org.hibernate.orm.jdbc.bind=TRACE[m
+ # =========================================================[m
+ [m
+ spring.servlet.multipart.max-file-size=10MB[m
+[31m-spring.servlet.multipart.max-request-size=10MB[m
+\ No newline at end of file[m
+[32m+[m[32mspring.servlet.multipart.max-request-size=10MB[m
+[32m+[m
+[32m+[m[32m# =========================================================[m
+[32m+[m[32m# APIs[m
+[32m+[m[32m# =========================================================[m
+[32m+[m
+[32m+[m[32mgoogle.maps.api-key=${GOOGLE_MAPS_API_KEY}[m
+\ No newline at end of file[m

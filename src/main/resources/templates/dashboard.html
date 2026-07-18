@@ -1,189 +1,723 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <head th:replace="~{layout/fragmentos :: head('Dashboard | EasySpot AI', 'dashboard')}"></head>
 
-    <body class="dashboard-page">
+    <head th:replace="~{layout/fragmentos :: head('Buscar parqueos', 'dashboard')}">
+    </head>
+
+    <body class="dashboard-body">
 
         <header th:replace="~{layout/fragmentos :: appNavbar}"></header>
 
-        <main class="dashboard-container">
+        <main class="dashboard-shell">
 
-            <section class="dashboard-hero">
-                <div>
-                    <span class="dashboard-badge">Dashboard inteligente</span>
-                    <h1>Encuentra el mejor parqueo en segundos.</h1>
-                    <p>
-                        Visualiza disponibilidad, predice ocupación y reserva espacios
-                        usando la información de EasySpot AI.
-                    </p>
-                </div>
+            <!-- SIDEBAR -->
+            <aside class="dashboard-sidebar">
 
-                <form class="dashboard-search">
-                    <input type="text" placeholder="Buscar destino, zona o parqueo...">
-                    <button type="button">Buscar con IA</button>
-                </form>
-            </section>
+                <div class="sidebar-brand">
 
-            <section class="dashboard-stats">
-                <div class="stat-card">
-                    <span>🅿️</span>
-                    <strong>324</strong>
-                    <p>Espacios disponibles</p>
-                </div>
-
-                <div class="stat-card">
-                    <span>📍</span>
-                    <strong>18</strong>
-                    <p>Parqueos monitoreados</p>
-                </div>
-
-                <div class="stat-card">
-                    <span>🤖</span>
-                    <strong>92%</strong>
-                    <p>Precisión IA</p>
-                </div>
-
-                <div class="stat-card">
-                    <span>⏱️</span>
-                    <strong>12 min</strong>
-                    <p>Tiempo ahorrado</p>
-                </div>
-            </section>
-
-            <section class="dashboard-grid">
-
-                <aside class="parking-panel">
-                    <span class="panel-badge">Opciones cercanas</span>
-                    <h2>Parqueos disponibles</h2>
-
-                    <div class="parking-list">
-                        <article class="parking-card active">
-                            <div>
-                                <h3>Parqueo Central Heredia</h3>
-                                <p>Heredia Centro</p>
-                            </div>
-                            <span>94/100</span>
-                            <ul>
-                                <li>🅿️ 18 espacios</li>
-                                <li>💵 ₡1200</li>
-                                <li>🚶 3 min</li>
-                                <li>🛡️ Alta</li>
-                            </ul>
-                        </article>
-
-                        <article class="parking-card">
-                            <div>
-                                <h3>Parqueo Mall San Pedro</h3>
-                                <p>San Pedro</p>
-                            </div>
-                            <span>86/100</span>
-                            <ul>
-                                <li>🅿️ 8 espacios</li>
-                                <li>💵 ₡1500</li>
-                                <li>🚶 5 min</li>
-                                <li>🛡️ Media</li>
-                            </ul>
-                        </article>
-
-                        <article class="parking-card">
-                            <div>
-                                <h3>Parqueo Avenida Segunda</h3>
-                                <p>San José Centro</p>
-                            </div>
-                            <span>72/100</span>
-                            <ul>
-                                <li>🅿️ 4 espacios</li>
-                                <li>💵 ₡1000</li>
-                                <li>🚶 7 min</li>
-                                <li>🛡️ Media</li>
-                            </ul>
-                        </article>
-                    </div>
-                </aside>
-
-                <section class="map-panel">
-                    <span class="panel-badge">Mapa inteligente</span>
-                    <h2>Disponibilidad en tiempo real</h2>
-
-                    <div class="smart-map">
-                        <div class="road road-one"></div>
-                        <div class="road road-two"></div>
-                        <div class="road road-three"></div>
-
-                        <button class="map-pin pin-green">P</button>
-                        <button class="map-pin pin-yellow">P</button>
-                        <button class="map-pin pin-red">P</button>
-
-                        <div class="map-info">
-                            <strong>Parqueo Central Heredia</strong>
-                            <p>18 espacios disponibles · 3 min</p>
-                        </div>
+                    <div class="sidebar-brand-icon">
+                        <i class="fa-solid fa-location-dot"></i>
                     </div>
 
-                    <div class="map-legend">
-                        <span><i class="green"></i> Disponible</span>
-                        <span><i class="yellow"></i> Alta ocupación</span>
-                        <span><i class="red"></i> Saturado</span>
+                    <div>
+                        <strong>EasySpot <span>AI</span></strong>
+                        <small>Smart Parking Platform</small>
                     </div>
+
+                </div>
+
+                <a th:href="@{/reservas/nueva}"
+                   class="new-reservation-btn">
+
+                    <i class="fa-solid fa-plus"></i>
+                    Nueva reserva
+
+                </a>
+
+                <nav class="sidebar-nav">
+
+                    <a th:href="@{/dashboard}" class="active">
+                        <i class="fa-solid fa-magnifying-glass-location"></i>
+                        <span>Buscar parqueos</span>
+                    </a>
+
+                    <a th:href="@{/reservas}">
+                        <i class="fa-regular fa-calendar-check"></i>
+                        <span>Mis reservas</span>
+                    </a>
+
+                    <a th:href="@{/favoritos}">
+                        <i class="fa-regular fa-heart"></i>
+                        <span>Favoritos</span>
+                    </a>
+
+                    <a th:href="@{/historial}">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Historial</span>
+                    </a>
+
+                    <a th:href="@{/reportes}">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>Reportes comunitarios</span>
+                    </a>
+
+                    <a th:href="@{/perfil}">
+                        <i class="fa-regular fa-user"></i>
+                        <span>Perfil</span>
+                    </a>
+
+                </nav>
+
+                <section class="premium-card">
+
+                    <div class="premium-title">
+                        <i class="fa-solid fa-crown"></i>
+                        <span>EasySpot Premium</span>
+                    </div>
+
+                    <p>Más beneficios, más ahorro.</p>
+
+                    <ul>
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+                            Descuentos exclusivos
+                        </li>
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+                            Reservas ilimitadas
+                        </li>
+
+                        <li>
+                            <i class="fa-solid fa-check"></i>
+                            Sin anuncios
+                        </li>
+                    </ul>
+
+                    <a href="#" class="premium-btn">
+                        Obtener Premium
+                    </a>
+
                 </section>
 
-                <aside class="ai-panel">
-                    <section class="recommendation-card">
-                        <span>EasySpot AI</span>
-                        <h2>Mejor opción encontrada</h2>
-                        <h3>Parqueo Central Heredia</h3>
-                        <p>Heredia Centro</p>
+            </aside>
 
-                        <div class="score-box">
-                            <strong>94</strong>
-                            <small>Smart Score</small>
+            <!-- CONTENIDO PRINCIPAL -->
+            <section class="dashboard-main">
+
+                <!-- BIENVENIDA -->
+                <div class="dashboard-welcome">
+
+                    <div>
+
+                        <p class="welcome-kicker">
+                            Búsqueda inteligente
+                        </p>
+
+                        <h1>
+                            ¡Hola,
+                            <span th:text="${session.usuarioLogueado.nombre}">
+                                Julián
+                            </span>!
+                        </h1>
+
+                        <p>
+                            Encuentra el parqueo ideal en segundos.
+                        </p>
+
+                    </div>
+
+                    <div class="demand-card">
+
+                        <div class="demand-icon">
+                            <i class="fa-solid fa-chart-line"></i>
                         </div>
 
-                        <ul>
-                            <li>✅ Alta probabilidad de encontrar espacio.</li>
-                            <li>✅ Buena relación precio/distancia.</li>
-                            <li>✅ Seguridad calificada como alta.</li>
-                        </ul>
+                        <div>
+                            <small>Demanda estimada</small>
+                            <strong>Alta en La Sabana</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- BUSCADOR -->
+                <form th:action="@{/dashboard}"
+                      method="get"
+                      class="search-panel">
+
+                    <div class="search-grid">
+
+                        <label class="field field-location">
+
+                            <span>¿Dónde quieres buscar?</span>
+
+                            <div class="field-control">
+
+                                <i class="fa-solid fa-location-dot"></i>
+
+                                <input type="text"
+                                       name="q"
+                                       th:value="${q}"
+                                       placeholder="La Sabana, San José">
+
+                            </div>
+
+                        </label>
+
+                        <label class="field">
+
+                            <span>Fecha</span>
+
+                            <input type="date"
+                                   name="fecha"
+                                   th:value="${fechaSeleccionada}">
+
+                        </label>
+
+                        <label class="field">
+
+                            <span>Hora de inicio</span>
+
+                            <input type="time"
+                                   name="horaInicio"
+                                   th:value="${horaInicioSeleccionada}">
+
+                        </label>
+
+                        <label class="field">
+
+                            <span>Hora de salida</span>
+
+                            <input type="time"
+                                   name="horaSalida"
+                                   th:value="${horaSalidaSeleccionada}">
+
+                        </label>
+
+                        <button type="submit" class="search-btn">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            Buscar
+                        </button>
+
+                    </div>
+
+                    <!-- FILTROS -->
+                    <div class="filter-row">
+
+                        <label class="filter-select">
+
+                            <i class="fa-solid fa-money-bill-wave"></i>
+
+                            <select name="precioMaximo">
+
+                                <option value="">
+                                    Cualquier precio
+                                </option>
+
+                                <option value="500"
+                                        th:selected="${precioMaximo != null
+                                        and precioMaximo.toString() == '500'}">
+                                    Hasta ₡500
+                                </option>
+
+                                <option value="700"
+                                        th:selected="${precioMaximo != null
+                                        and precioMaximo.toString() == '700'}">
+                                    Hasta ₡700
+                                </option>
+
+                                <option value="1000"
+                                        th:selected="${precioMaximo != null
+                                        and precioMaximo.toString() == '1000'}">
+                                    Hasta ₡1.000
+                                </option>
+
+                            </select>
+
+                        </label>
+
+                        <label class="filter-select">
+
+                            <i class="fa-solid fa-square-parking"></i>
+
+                            <select name="espaciosMinimos">
+
+                                <option value="">
+                                    Cualquier disponibilidad
+                                </option>
+
+                                <option value="1"
+                                        th:selected="${espaciosMinimos == 1}">
+                                    Al menos 1 espacio
+                                </option>
+
+                                <option value="5"
+                                        th:selected="${espaciosMinimos == 5}">
+                                    Al menos 5 espacios
+                                </option>
+
+                                <option value="10"
+                                        th:selected="${espaciosMinimos == 10}">
+                                    Al menos 10 espacios
+                                </option>
+
+                                <option value="20"
+                                        th:selected="${espaciosMinimos == 20}">
+                                    Al menos 20 espacios
+                                </option>
+
+                            </select>
+
+                        </label>
+
+                        <label class="filter-select">
+
+                            <i class="fa-solid fa-warehouse"></i>
+
+                            <select name="techado">
+
+                                <option value="">
+                                    Cualquier tipo
+                                </option>
+
+                                <option value="true"
+                                        th:selected="${techado != null and techado}">
+                                    Techado
+                                </option>
+
+                                <option value="false"
+                                        th:selected="${techado != null and !techado}">
+                                    Al aire libre
+                                </option>
+
+                            </select>
+
+                        </label>
+
+                        <a th:href="@{/dashboard}"
+                           class="clear-filters">
+
+                            <i class="fa-solid fa-rotate-left"></i>
+                            Limpiar filtros
+
+                        </a>
+
+                    </div>
+
+                </form>
+
+                <div class="dashboard-content-grid">
+
+                    <!-- MAPA -->
+                    <section class="map-card">
+
+                        <div class="map-card-header">
+
+                            <div>
+                                <span class="section-label">
+                                    Mapa inteligente
+                                </span>
+
+                                <h2>Parqueos cercanos</h2>
+                            </div>
+
+                            <span class="live-badge">
+                                <span></span>
+                                En tiempo real
+                            </span>
+
+                        </div>
+
+                        <!-- GOOGLE MAPS -->
+                        <div class="map-container">
+
+                            <div id="googleMap">
+
+                                <div class="map-loading">
+
+                                    <i class="fa-solid fa-location-dot"></i>
+
+                                    <span>
+                                        Cargando mapa...
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <!-- BOTÓN MI UBICACIÓN -->
+                            <button
+                                id="btnMyLocation"
+                                class="map-my-location"
+                                type="button"
+                                title="Mi ubicación"
+                                aria-label="Mi ubicación">
+
+                                <i class="fa-solid fa-location-crosshairs"></i>
+
+                            </button>
+
+                        </div>
+
+                        <!--
+                            Datos ocultos utilizados por dashboard.js
+                            para crear los marcadores del mapa.
+                        -->
+                        <div id="parkingMapData"
+                             class="d-none"
+                             aria-hidden="true">
+
+                            <div th:each="item : ${parqueos}"
+                                 class="parking-map-item"
+                                 th:data-id="${item.parqueo.idParqueo}"
+                                 th:data-nombre="${item.parqueo.nombre}"
+                                 th:data-direccion="${item.parqueo.direccion}"
+                                 th:data-latitud="${item.parqueo.latitud}"
+                                 th:data-longitud="${item.parqueo.longitud}"
+                                 th:data-precio="${item.parqueo.tarifaHora}"
+                                 th:data-espacios="${item.parqueo.espaciosDisponibles}"
+                                 th:data-calificacion="${item.parqueo.calificacion}"
+                                 th:data-mejor="${item.mejorOpcion}">
+                            </div>
+
+                        </div>
+
+                        <!-- ESTADÍSTICAS -->
+                        <div class="dashboard-stats">
+
+                            <article>
+
+                                <i class="fa-regular fa-clock"></i>
+
+                                <div>
+                                    <small>
+                                        Tiempo estimado ahorrado
+                                    </small>
+
+                                    <strong>19 min</strong>
+                                </div>
+
+                            </article>
+
+                            <article>
+
+                                <i class="fa-solid fa-wallet"></i>
+
+                                <div>
+
+                                    <small>
+                                        Mejor precio encontrado
+                                    </small>
+
+                                    <strong th:if="${mejorParqueo != null}"
+                                            th:text="'₡'
+                                            + ${#numbers.formatDecimal(
+                                            mejorParqueo.parqueo.tarifaHora,
+                                            0, 'COMMA', 0, 'POINT')}">
+                                        ₡600
+                                    </strong>
+
+                                    <strong th:if="${mejorParqueo == null}">
+                                        No disponible
+                                    </strong>
+
+                                </div>
+
+                            </article>
+
+                            <article>
+
+                                <i class="fa-solid fa-leaf"></i>
+
+                                <div>
+                                    <small>
+                                        Impacto ambiental
+                                    </small>
+
+                                    <strong>2.4 kg CO₂</strong>
+                                </div>
+
+                            </article>
+
+                            <article>
+
+                                <i class="fa-solid fa-square-parking"></i>
+
+                                <div>
+                                    <small>
+                                        Espacios disponibles
+                                    </small>
+
+                                    <strong th:text="${totalEspacios}">
+                                        27
+                                    </strong>
+                                </div>
+
+                            </article>
+
+                        </div>
+
                     </section>
 
-                    <section class="prediction-card">
-                        <span>Predicción</span>
-                        <h2>Ocupación estimada</h2>
+                    <!-- RESULTADOS -->
+                    <aside class="results-panel">
 
-                        <div class="prediction-row">
-                            <div><strong>Ahora</strong><small>70%</small></div>
-                            <div class="bar"><i style="width:70%"></i></div>
+                        <div class="results-header">
+
+                            <div>
+
+                                <span class="section-label">
+                                    Resultados
+                                </span>
+
+                                <h2>
+                                    <span th:text="${totalEspacios}">
+                                        27
+                                    </span>
+
+                                    espacios disponibles
+                                </h2>
+
+                            </div>
+
+                            <span class="result-count"
+                                  th:text="${cantidadResultados + ' parqueos'}">
+                                4 parqueos
+                            </span>
+
                         </div>
 
-                        <div class="prediction-row">
-                            <div><strong>15 min</strong><small>60%</small></div>
-                            <div class="bar"><i style="width:60%"></i></div>
+                        <div class="results-list"
+                             th:if="${!#lists.isEmpty(parqueos)}">
+
+                            <article th:each="item : ${parqueos}"
+                                     class="parking-card"
+                                     th:classappend="${item.mejorOpcion}
+                                     ? ' recommended' : ''"
+                                     th:data-parking-id="${item.parqueo.idParqueo}"
+                                     th:data-parqueo-card="${item.parqueo.idParqueo}">
+
+                                <span th:if="${item.mejorOpcion}"
+                                      class="recommended-badge">
+                                    Mejor opción
+                                </span>
+
+                                <div class="parking-card-top">
+
+                                    <div class="parking-icon">
+                                        <i class="fa-solid fa-square-parking"></i>
+                                    </div>
+
+                                    <div class="parking-main-info">
+
+                                        <h3 th:text="${item.parqueo.nombre}">
+                                            Parqueo La Sabana
+                                        </h3>
+
+                                        <p>
+
+                                            <i class="fa-solid fa-location-dot"></i>
+
+                                            <span th:text="${item.parqueo.direccion}">
+                                                La Sabana
+                                            </span>
+
+                                        </p>
+
+                                        <div class="rating-row">
+
+                                            <i class="fa-solid fa-star"></i>
+
+                                            <strong th:text="${item.parqueo.calificacion}">
+                                                4.8
+                                            </strong>
+
+                                            <span th:text="'('
+                                                  + ${item.parqueo.totalResenas}
+                                                  + ' reseñas)'">
+                                                (128 reseñas)
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="parking-price">
+
+                                        <strong th:text="'₡'
+                                                + ${#numbers.formatDecimal(
+                                                item.parqueo.tarifaHora,
+                                                0, 'COMMA', 0, 'POINT')}">
+                                            ₡600
+                                        </strong>
+
+                                        <span>por hora</span>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="parking-features">
+
+                                    <span th:if="${item.parqueo.techado}">
+                                        <i class="fa-solid fa-warehouse"></i>
+                                        Techado
+                                    </span>
+
+                                    <span th:if="${item.parqueo.seguridad24h}">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                        Seguridad 24/7
+                                    </span>
+
+                                    <span th:if="${item.parqueo.camaras}">
+                                        <i class="fa-solid fa-video"></i>
+                                        Cámaras
+                                    </span>
+
+                                    <span th:if="${item.parqueo.accesoDiscapacidad}">
+                                        <i class="fa-solid fa-wheelchair"></i>
+                                        Accesible
+                                    </span>
+
+                                </div>
+
+                                <div class="parking-card-footer">
+
+                                    <div class="availability"
+                                         th:classappend="${item.nivelDisponibilidad}">
+
+                                        <span class="availability-dot"></span>
+
+                                        <div>
+
+                                            <strong th:text="${item.parqueo.espaciosDisponibles
+                                                    + ' espacios'}">
+                                                15 espacios
+                                            </strong>
+
+                                            <small th:text="${item.porcentajeOcupacion
+                                                   + '% ocupado'}">
+                                                80% ocupado
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+                                    <a th:if="${item.parqueo.espaciosDisponibles > 0}"
+                                       th:href="@{/reservas/nueva(
+                                       idParqueo=${item.parqueo.idParqueo},
+                                       fecha=${fechaSeleccionada},
+                                       horaInicio=${horaInicioSeleccionada},
+                                       horaSalida=${horaSalidaSeleccionada}
+                                       )}"
+                                       class="reserve-btn">
+
+                                        Reservar
+
+                                    </a>
+
+                                    <button th:if="${item.parqueo.espaciosDisponibles == 0}"
+                                            type="button"
+                                            class="reserve-btn disabled"
+                                            disabled>
+
+                                        Agotado
+
+                                    </button>
+
+                                </div>
+
+                            </article>
+
                         </div>
 
-                        <div class="prediction-row">
-                            <div><strong>30 min</strong><small>50%</small></div>
-                            <div class="bar"><i style="width:50%"></i></div>
+                        <!-- SIN RESULTADOS -->
+                        <div class="empty-results"
+                             th:if="${#lists.isEmpty(parqueos)}">
+
+                            <i class="fa-solid fa-map-location-dot"></i>
+
+                            <h3>No encontramos parqueos</h3>
+
+                            <p>
+                                Prueba con otra ubicación o elimina algunos filtros.
+                            </p>
+
+                            <a th:href="@{/dashboard}">
+                                Mostrar todos
+                            </a>
+
                         </div>
 
-                        <div class="prediction-row">
-                            <div><strong>45 min</strong><small>38%</small></div>
-                            <div class="bar"><i style="width:38%"></i></div>
-                        </div>
-                    </section>
+                    </aside>
 
-                    <section class="quick-reserve">
-                        <span>Reserva rápida</span>
-                        <h2>Espacio asignado</h2>
-                        <p>#18 · Heredia Centro</p>
-                        <button>Reservar ahora</button>
-                    </section>
-                </aside>
+                </div>
+
+                <!-- ASISTENTE -->
+                <section class="assistant-card"
+                         th:if="${mejorParqueo != null}">
+
+                    <div class="assistant-avatar">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+
+                    <div class="assistant-message">
+
+                        <div>
+                            <strong>EasyBot AI</strong>
+                            <span>Sugerencia inteligente</span>
+                        </div>
+
+                        <p>
+
+                            Te recomiendo
+
+                            <strong th:text="${mejorParqueo.parqueo.nombre}">
+                                Parqueo La Sabana
+                            </strong>
+
+                            por su relación entre precio, disponibilidad,
+                            calificación y seguridad.
+
+                        </p>
+
+                    </div>
+
+                    <a th:href="@{/reservas/nueva(
+                       idParqueo=${mejorParqueo.parqueo.idParqueo},
+                       fecha=${fechaSeleccionada},
+                       horaInicio=${horaInicioSeleccionada},
+                       horaSalida=${horaSalidaSeleccionada}
+                       )}"
+                       class="assistant-action">
+
+                        Reservar mejor opción
+
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+                    </a>
+
+                </section>
 
             </section>
 
         </main>
 
+        <!-- SCRIPTS GENERALES -->
         <div th:replace="~{layout/fragmentos :: scripts}"></div>
 
+        <!-- JAVASCRIPT DEL DASHBOARD -->
+        <script th:src="@{/js/dashboard.js}"></script>
+
+        <!-- GOOGLE MAPS JAVASCRIPT API -->
+        <script th:src="|https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&amp;loading=async&amp;callback=initMap&amp;v=weekly|"
+                async
+                defer>
+        </script>
+
     </body>
+
 </html>

@@ -33,14 +33,6 @@ public class HomeController {
         return "home";
     }
 
-    @GetMapping("/dashboard")
-    public String dashboard(HttpSession session) {
-        if (noLogueado(session)) {
-            return "redirect:/login";
-        }
-        return "dashboard";
-    }
-
     @GetMapping("/reservas")
     public String reservas(HttpSession session) {
         if (noLogueado(session)) {
