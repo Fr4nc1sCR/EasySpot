@@ -530,7 +530,7 @@ input[type="time"] {
 
 #googleMap {
     width: 100%;
-    height: 520px;
+    height: 620px;
     min-height: 520px;
 }
 
@@ -1038,6 +1038,7 @@ input[type="time"] {
 
 .parking-price {
     text-align: right;
+    padding-right: 50px;
 }
 
 .parking-price strong,
@@ -1504,9 +1505,9 @@ input[type="time"] {
     border-radius: 17px;
     background:
         linear-gradient(
-            145deg,
-            rgba(11, 22, 39, 0.97),
-            rgba(2, 6, 23, 0.96)
+        145deg,
+        rgba(11, 22, 39, 0.97),
+        rgba(2, 6, 23, 0.96)
         );
     box-shadow:
         0 18px 45px rgba(2, 6, 23, 0.44),
@@ -1548,7 +1549,7 @@ input[type="time"] {
         135deg,
         var(--easyspot-blue),
         var(--easyspot-primary)
-    );
+        );
     box-shadow: 0 9px 20px rgba(37, 99, 235, 0.24);
 }
 
@@ -1688,7 +1689,7 @@ input[type="time"] {
         135deg,
         var(--easyspot-primary),
         #22d3ee
-    );
+        );
 }
 
 .route-panel-actions a:hover {
@@ -1794,6 +1795,105 @@ input[type="time"] {
     box-shadow:
         inset 0 0 0 1px rgba(37, 99, 235, 0.08),
         0 16px 38px rgba(2, 6, 23, 0.22);
+}
+
+/* ===========================
+   MENSAJES DEL DASHBOARD
+=========================== */
+
+.dashboard-alert {
+    margin-bottom: 20px;
+    padding: 13px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    border-radius: 13px;
+}
+
+.dashboard-alert-success {
+    color: #86efac;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    background: rgba(34, 197, 94, 0.09);
+}
+
+.dashboard-alert-error {
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    background: rgba(239, 68, 68, 0.09);
+}
+
+/* ===========================
+   BOTÓN DE FAVORITOS
+=========================== */
+
+.parking-favorite-action {
+    position: absolute;
+    z-index: 10;
+    top: 14px;
+    right: 14px;
+}
+
+.favorite-toggle-form {
+    margin: 0;
+}
+
+.favorite-toggle-button {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+
+    display: grid;
+    place-items: center;
+
+    color: var(--easyspot-muted);
+    font-size: 0.95rem;
+
+    border: 1px solid var(--easyspot-border);
+    border-radius: 50%;
+
+    background: rgba(2, 6, 23, 0.9);
+
+    box-shadow: 0 7px 18px rgba(0, 0, 0, 0.28);
+
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.favorite-toggle-button:hover {
+    color: #fb7185;
+    border-color: rgba(244, 63, 94, 0.4);
+    background: rgba(244, 63, 94, 0.13);
+    transform: scale(1.08);
+}
+
+.favorite-toggle-button.active {
+    color: #fb7185;
+    border-color: rgba(244, 63, 94, 0.35);
+    background: rgba(244, 63, 94, 0.13);
+}
+
+.favorite-toggle-button.active:hover {
+    color: #fda4af;
+    background: rgba(244, 63, 94, 0.2);
+}
+
+.favorite-toggle-button:active {
+    transform: scale(0.92);
+}
+
+/*
+ Evita que el corazón cubra el contenido
+ superior de la tarjeta.
+*/
+.parking-card-top {
+    padding-top: 0;
 }
 
 @media (max-width: 760px) {

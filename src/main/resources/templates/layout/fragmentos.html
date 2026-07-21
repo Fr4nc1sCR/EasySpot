@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
     <head th:fragment="head(titulo, css)">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,42 +15,120 @@
 
     <body>
 
-        <header th:fragment="publicNavbar" class="public-navbar">
-            <nav class="navbar-container">
-                <a th:href="@{/}" class="navbar-logo">
-                    <span>EasySpot <strong>AI</strong></span>
+        <!-- SIDEBAR -->
+        <aside th:fragment="sidebar(opcionActiva)" class="dashboard-sidebar">
+
+            <div class="sidebar-brand">
+
+                <div class="sidebar-brand-icon">
+                    <i class="fa-solid fa-location-dot"></i>
+                </div>
+
+                <div>
+                    <strong>EasySpot <span>AI</span></strong>
                     <small>Smart Parking Platform</small>
+                </div>
+
+            </div>
+
+            <a th:href="@{/reservas/nueva}"
+               class="new-reservation-btn">
+
+                <i class="fa-solid fa-plus"></i>
+                Nueva reserva
+
+            </a>
+
+            <nav class="sidebar-nav">
+
+                <a th:href="@{/dashboard}"
+                   th:classappend="${opcionActiva == 'dashboard'} ? ' active' : ''">
+
+                    <i class="fa-solid fa-magnifying-glass-location"></i>
+                    <span>Buscar parqueos</span>
+
                 </a>
 
-                <div class="navbar-actions">
-                    <a th:href="@{/login}" class="btn-outline">Iniciar sesión</a>
-                    <a th:href="@{/registro}" class="btn-primary">Registrarse</a>
-                </div>
-            </nav>
-        </header>
+                <a th:href="@{/reservas}"
+                   th:classappend="${opcionActiva == 'reservas'} ? ' active' : ''">
 
-        <header th:fragment="appNavbar" class="app-navbar">
-            <nav class="navbar-container">
+                    <i class="fa-regular fa-calendar-check"></i>
+                    <span>Mis reservas</span>
 
-                <a th:href="@{/home}" class="navbar-logo">
-                    <span>EasySpot <strong>AI</strong></span>
-                    <small>Panel inteligente</small>
                 </a>
 
-                <div class="app-links">
-                    <a th:href="@{/home}">Inicio</a>
-                    <a th:href="@{/dashboard}">Buscar Parqueo</a>
-                    <a th:href="@{/reservas}">Reservas</a>
-                    <a th:href="@{/reportes}">Reportes</a>
-                    <a th:href="@{/perfil}">Perfil</a>
-                </div>
+                <a th:href="@{/favoritos}"
+                   th:classappend="${opcionActiva == 'favoritos'} ? ' active' : ''">
 
-                <div class="navbar-right">
-                    <a th:href="@{/logout}" class="logout-btn">Salir</a>
-                </div>
+                    <i class="fa-regular fa-heart"></i>
+                    <span>Favoritos</span>
+
+                </a>
+
+                <a th:href="@{/historial}"
+                   th:classappend="${opcionActiva == 'historial'} ? ' active' : ''">
+
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Historial</span>
+
+                </a>
+
+                <a th:href="@{/reportes}"
+                   th:classappend="${opcionActiva == 'reportes'} ? ' active' : ''">
+
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Reportes comunitarios</span>
+
+                </a>
+
+                <a th:href="@{/perfil}"
+                   th:classappend="${opcionActiva == 'perfil'} ? ' active' : ''">
+
+                    <i class="fa-regular fa-user"></i>
+                    <span>Perfil</span>
+
+                </a>
+
+                <a th:href="@{/logout}">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Cerrar sesión</span>
+                </a>
 
             </nav>
-        </header>
+
+            <section class="premium-card">
+
+                <div class="premium-title">
+                    <i class="fa-solid fa-crown"></i>
+                    <span>EasySpot Premium</span>
+                </div>
+
+                <p>Más beneficios, más ahorro.</p>
+
+                <ul>
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Descuentos exclusivos
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Reservas ilimitadas
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Sin anuncios
+                    </li>
+                </ul>
+
+                <a href="#" class="premium-btn">
+                    Obtener Premium
+                </a>
+
+            </section>
+
+        </aside>
 
         <div th:fragment="scripts">
             <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>

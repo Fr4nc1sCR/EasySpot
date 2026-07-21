@@ -151,6 +151,8 @@ async function initMap() {
 
         locateUser(true);
 
+        openParkingFromUrl();
+
     } catch (error) {
 
         console.error(
@@ -240,9 +242,9 @@ function createInfoWindowContent(parking) {
                     <span>
                         <i class="fa-solid fa-car"></i>
                         ${calculateEstimatedMinutes(
-                                parking.distanceMeters,
-                                25
-                                )} min aprox.
+            parking.distanceMeters,
+            25
+            )} min aprox.
                     </span>
 
                 </div>
@@ -299,8 +301,7 @@ function createInfoWindowContent(parking) {
                 </button>
 
                 <a
-                    href="/reservas/nueva?idParqueo=${encodeURIComponent(parking.id)}"
-                    class="map-info-button">
+                    href="${createReservationUrl(parking.id)}" class="map-info-button">
 
                     Reservar ahora
 
@@ -310,29 +311,6 @@ function createInfoWindowContent(parking) {
 
         </article>
     `;
-}
-
-/**
- * Abre la ventana de información de un parqueo.
- */
-function openParkingInfo(
-        parkingId,
-        marker,
-        infoWindow
-        ) {
-
-    if (activeInfoWindow) {
-        activeInfoWindow.close();
-    }
-
-    infoWindow.open({
-        anchor: marker,
-        map: map
-    });
-
-    activeInfoWindow = infoWindow;
-
-    highlightCard(parkingId);
 }
 
 /**
@@ -466,6 +444,70 @@ function focusParkingOnMap(parkingId) {
 }
 
 /**
+ * Abre el popup blanco del parqueo seleccionado.
+ */
+function openParkingInfo(
+        parkingId,
+        marker,
+        infoWindow
+        ) {
+
+    if (!map || !marker || !infoWindow) {
+        console.warn(
+                "No fue posible abrir la información del parqueo:",
+                parkingId
+                );
+        return;
+    }
+
+    /*
+     * Cierra el popup que estuviera abierto anteriormente.
+     */
+    if (activeInfoWindow
+            && activeInfoWindow !== infoWindow) {
+
+        activeInfoWindow.close();
+    }
+
+    /*
+     * Cierra el panel de ruta activo para que
+     * no cubra la información del parqueo.
+     */
+    clearActiveRoute();
+
+    /*
+     * Actualiza el contenido por si la distancia
+     * del parqueo cambió luego de obtener ubicación.
+     */
+    const parking = parkingDataRegistry.get(
+            String(parkingId)
+            );
+
+    if (parking) {
+
+        infoWindow.setContent(
+                createInfoWindowContent(parking)
+                );
+    }
+
+    /*
+     * Abre el InfoWindow sobre el marcador.
+     */
+    infoWindow.open({
+        map: map,
+        anchor: marker,
+        shouldFocus: false
+    });
+
+    activeInfoWindow = infoWindow;
+
+    /*
+     * Resalta la tarjeta correspondiente.
+     */
+    highlightCard(parkingId);
+}
+
+/**
  * Resalta la tarjeta correspondiente
  * al marcador seleccionado.
  */
@@ -591,46 +633,52 @@ function locateUser(centerMap = true) {
     navigator.geolocation.getCurrentPosition(
             (position) => {
 
-                userLocation = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude,
-                    accuracy: position.coords.accuracy
-                };
+        userLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            accuracy: position.coords.accuracy
+        };
 
-                console.log(
-                        "Ubicación obtenida:",
-                        userLocation
-                        );
+        console.log(
+                "Ubicación obtenida:",
+                userLocation
+                );
 
-                createOrUpdateUserMarker();
+        createOrUpdateUserMarker();
 
-                updateParkingDistances();
+        updateParkingDistances();
 
-                sortParkingCardsByDistance();
+        sortParkingCardsByDistance();
 
-                showLocationAccuracy();
+        showLocationAccuracy();
 
-                showLocationButtonState(
-                        "success",
-                        "Mi ubicación"
-                        );
+        showLocationButtonState(
+                "success",
+                "Mi ubicación"
+                );
 
-                if (centerMap) {
-                    centerMapOnUser();
-                }
+        if (centerMap) {
+            centerMapOnUser();
+        }
 
-            },
+        /*
+         * Si el usuario llegó desde Favoritos,
+         * abre automáticamente la ruta.
+         */
+        openParkingFromUrl();
+
+    },
             (error) => {
 
-                handleGeolocationError(error);
+        handleGeolocationError(error);
 
-            },
+    },
             {
                 enableHighAccuracy: true,
                 timeout: 10000,
                 maximumAge: 60000
             }
-            );
+    );
 }
 
 /**
@@ -888,32 +936,32 @@ function updateParkingDistances() {
     parkingDataRegistry.forEach(
             (parking, parkingId) => {
 
-                if (!hasValidCoordinates(parking)) {
-                    return;
-                }
+        if (!hasValidCoordinates(parking)) {
+            return;
+        }
 
-                const distanceMeters =
-                        calculateDistanceMeters(
-                                userLocation.lat,
-                                userLocation.lng,
-                                parking.latitud,
-                                parking.longitud
-                                );
-
-                parking.distanceMeters =
-                        distanceMeters;
-
-                updateParkingCardDistance(
-                        parkingId,
-                        distanceMeters
+        const distanceMeters =
+                calculateDistanceMeters(
+                        userLocation.lat,
+                        userLocation.lng,
+                        parking.latitud,
+                        parking.longitud
                         );
 
-                refreshParkingInfoWindow(
-                        parkingId,
-                        parking
-                        );
-            }
-            );
+        parking.distanceMeters =
+                distanceMeters;
+
+        updateParkingCardDistance(
+                parkingId,
+                distanceMeters
+                );
+
+        refreshParkingInfoWindow(
+                parkingId,
+                parking
+                );
+    }
+    );
 }
 
 /**
@@ -1233,9 +1281,9 @@ function showLocationAccuracy() {
     closeButton?.addEventListener(
             "click",
             () => {
-                accuracyMessage.remove();
-            }
-            );
+        accuracyMessage.remove();
+    }
+    );
 }
 
 
@@ -1244,6 +1292,11 @@ function showLocationAccuracy() {
  * del usuario hasta el parqueo seleccionado.
  */
 async function showRouteToParking(parkingId) {
+
+    if (activeInfoWindow) {
+        activeInfoWindow.close();
+        activeInfoWindow = null;
+    }
 
     const parking = parkingDataRegistry.get(
             String(parkingId)
@@ -1343,11 +1396,6 @@ function drawRouteOnMap(route) {
     });
 
     activeRoutePolylines = polylines;
-
-    if (route.viewport) {
-        map.fitBounds(route.viewport, 70);
-        return;
-    }
 
     centerActiveRoute();
 }
@@ -1502,8 +1550,8 @@ function getRouteDistanceMeters(route) {
         const distance = Number(leg.distanceMeters);
 
         return total + (
-            Number.isFinite(distance) ? distance : 0
-            );
+                Number.isFinite(distance) ? distance : 0
+                );
 
     }, 0);
 }
@@ -1526,8 +1574,8 @@ function getRouteDurationMillis(route) {
         const duration = Number(leg.durationMillis);
 
         return total + (
-            Number.isFinite(duration) ? duration : 0
-            );
+                Number.isFinite(duration) ? duration : 0
+                );
 
     }, 0);
 }
@@ -1600,8 +1648,24 @@ function clearRoutePolylines() {
  */
 function centerActiveRoute() {
 
-    if (activeRoute?.viewport) {
-        map.fitBounds(activeRoute.viewport, 70);
+    if (!map || !activeRoute) {
+        return;
+    }
+
+    const padding = {
+        top: 120,
+        right: 80,
+        bottom: 100,
+        left: 430
+    };
+
+    if (activeRoute.viewport) {
+
+        map.fitBounds(
+                activeRoute.viewport,
+                padding
+                );
+
         return;
     }
 
@@ -1620,7 +1684,7 @@ function centerActiveRoute() {
         });
     });
 
-    map.fitBounds(bounds, 70);
+    map.fitBounds(bounds, padding);
 }
 
 /**
@@ -1716,6 +1780,65 @@ function escapeHtml(value) {
     element.textContent = value ?? "";
 
     return element.innerHTML;
+}
+
+/**
+ * Crea la reservación a la hora de querer 
+ * reservar desde el mapa de google
+ */
+function createReservationUrl(parkingId) {
+
+    const fecha = document.querySelector('input[name="fecha"]')?.value;
+    const horaInicio = document.querySelector('input[name="horaInicio"]')?.value;
+    const horaSalida = document.querySelector('input[name="horaSalida"]')?.value;
+
+    const params = new URLSearchParams();
+
+    params.set("idParqueo", parkingId);
+
+    if (fecha) {
+        params.set("fecha", fecha);
+    }
+
+    if (horaInicio) {
+        params.set("horaInicio", horaInicio);
+    }
+
+    if (horaSalida) {
+        params.set("horaSalida", horaSalida);
+    }
+
+    return `/reservas/nueva?${params.toString()}`;
+}
+
+/**
+ * Si el dashboard se abrió con ?idParqueo=,
+ * selecciona automáticamente ese parqueo
+ * y muestra la ruta.
+ */
+function openParkingFromUrl() {
+
+    const params = new URLSearchParams(window.location.search);
+
+    const parkingId = params.get("idParqueo");
+
+    if (!parkingId) {
+        return;
+    }
+
+    // Abre el marcador
+    focusParkingOnMap(parkingId);
+
+    // Espera un momento para que termine
+    // de cargar el mapa y obtener ubicación.
+    setTimeout(() => {
+
+        if (userLocation) {
+            showRouteToParking(parkingId);
+        }
+
+    }, 1200);
+
 }
 
 /*

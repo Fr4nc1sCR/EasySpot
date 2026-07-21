@@ -2,12 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.easyspot.service;
+package com.easyspot.impl;
 
 // Importes
 import com.easyspot.domain.Parqueo;
 import com.easyspot.dto.ParqueoDashboardDTO;
 import com.easyspot.repository.ParqueoRepository;
+import com.easyspot.service.ParqueoService;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
@@ -95,8 +96,8 @@ public class ParqueoServiceImpl implements ParqueoService {
                 ? 0
                 : parqueo.getCalificacion().doubleValue();
 
-        double puntuacion =
-                disponibles * 2.0
+        double puntuacion
+                = disponibles * 2.0
                 - precio / 100.0
                 + (100 - porcentajeOcupacion) * 0.4
                 + calificacion * 10
@@ -131,5 +132,15 @@ public class ParqueoServiceImpl implements ParqueoService {
 
     private int valorSeguro(Integer valor) {
         return valor == null ? 0 : valor;
+    }
+
+    @Override
+    public Parqueo obtenerPorId(Long idParqueo) {
+        return parqueoRepository.findById(idParqueo).orElse(null);
+    }
+
+    @Override
+    public Parqueo guardar(Parqueo parqueo) {
+        return parqueoRepository.save(parqueo);
     }
 }

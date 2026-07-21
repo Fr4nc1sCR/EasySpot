@@ -71,7 +71,7 @@ public class AuthController {
 
         session.setAttribute("usuarioLogueado", usuario.get());
 
-        return "redirect:/home?loginExitoso";
+        return "redirect:/dashboard?loginExitoso";
     }
 
     @GetMapping("/logout")

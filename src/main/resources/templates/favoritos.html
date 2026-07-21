@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{layout/fragmentos :: head(
+          'Mis favoritos | EasySpot AI',
+          'favoritos'
+          )}">
+    </head>
+
+    <body class="dashboard-body">
+
+        <div class="dashboard-shell">
+
+            <!-- SIDEBAR -->
+            <aside th:replace="~{layout/fragmentos :: sidebar('favoritos')}"></aside>
+
+            <!-- CONTENIDO PRINCIPAL -->
+            <main class="favorites-main">
+
+                <!-- ENCABEZADO -->
+                <section class="favorites-header">
+
+                    <div class="favorites-header-text">
+
+                        <div class="section-badge">
+                            <i class="fa-solid fa-heart"></i>
+                            <span>Parqueos guardados</span>
+                        </div>
+
+                        <h1>Mis favoritos</h1>
+
+                        <p>
+                            Guarda tus parqueos preferidos y accede rápidamente
+                            a ellos cuando necesites realizar una nueva reserva.
+                        </p>
+
+                    </div>
+
+                    <!-- TARJETA DE RESUMEN -->
+                    <article class="favorites-summary-card">
+
+                        <div class="summary-icon">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+
+                        <div class="summary-information">
+                            <span>Favoritos guardados</span>
+
+                            <strong th:text="${totalFavoritos}">
+                                0
+                            </strong>
+
+                            <small th:text="${totalFavoritos == 1}
+                                   ? 'parqueo favorito'
+                                   : 'parqueos favoritos'">
+                                parqueos favoritos
+                            </small>
+                        </div>
+
+                    </article>
+
+                </section>
+
+                <!-- MENSAJE DE ÉXITO -->
+                <div th:if="${success}"
+                     class="alert-message alert-success-message">
+
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span th:text="${success}"></span>
+
+                </div>
+
+                <!-- LISTA DE FAVORITOS -->
+                <section class="favorites-section"
+                         th:if="${favoritos != null and !#lists.isEmpty(favoritos)}">
+
+                    <div class="section-heading">
+
+                        <div>
+                            <span class="section-label">Tus parqueos</span>
+                            <h2>Parqueos favoritos</h2>
+                        </div>
+
+                        <a th:href="@{/dashboard}"
+                           class="search-more-button">
+
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            Buscar más parqueos
+
+                        </a>
+
+                    </div>
+
+                    <div class="favorites-grid">
+
+                        <!-- TARJETA -->
+                        <article class="favorite-card"
+                                 th:each="favorito : ${favoritos}">
+
+                            <!-- IMAGEN -->
+                            <div class="favorite-card-image">
+
+                                <img th:if="${favorito.parqueo.imagenUrl != null
+                                     and !#strings.isEmpty(favorito.parqueo.imagenUrl)}"
+                                     th:src="${favorito.parqueo.imagenUrl}"
+                                     th:alt="${favorito.parqueo.nombre}">
+
+                                <div th:unless="${favorito.parqueo.imagenUrl != null
+                                     and !#strings.isEmpty(favorito.parqueo.imagenUrl)}"
+                                     class="parking-image-placeholder">
+
+                                    <i class="fa-solid fa-square-parking"></i>
+
+                                </div>
+
+                                <div class="favorite-heart">
+                                    <i class="fa-solid fa-heart"></i>
+                                </div>
+
+                                <span class="availability-badge"
+                                      th:classappend="${favorito.parqueo.espaciosDisponibles > 0}
+                                      ? ' available'
+                                      : ' unavailable'">
+
+                                    <i class="fa-solid fa-circle"></i>
+
+                                    <span th:text="${favorito.parqueo.espaciosDisponibles > 0}
+                                          ? 'Disponible'
+                                          : 'Sin espacios'">
+                                        Disponible
+                                    </span>
+
+                                </span>
+
+                            </div>
+
+                            <!-- INFORMACIÓN -->
+                            <div class="favorite-card-content">
+
+                                <div class="parking-title-row">
+
+                                    <div>
+                                        <h3 th:text="${favorito.parqueo.nombre}">
+                                            Parqueo Central
+                                        </h3>
+
+                                        <p class="parking-location">
+
+                                            <i class="fa-solid fa-location-dot"></i>
+
+                                            <span th:text="|${favorito.parqueo.canton}, ${favorito.parqueo.provincia}|">
+                                                San José, San José
+                                            </span>
+
+                                        </p>
+                                    </div>
+
+                                    <!-- CALIFICACIÓN -->
+                                    <div class="parking-rating">
+
+                                        <i class="fa-solid fa-star"></i>
+
+                                        <strong th:text="${favorito.parqueo.calificacion != null}
+                                                ? ${favorito.parqueo.calificacion}
+                                                : '--'">
+                                            4.8
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                                <p class="parking-address"
+                                   th:text="${favorito.parqueo.direccion}">
+                                    Dirección del parqueo
+                                </p>
+
+                                <!-- DATOS -->
+                                <div class="parking-details">
+
+                                    <div class="detail-item">
+
+                                        <div class="detail-icon">
+                                            <i class="fa-solid fa-car"></i>
+                                        </div>
+
+                                        <div>
+                                            <span>Disponibles</span>
+
+                                            <strong th:text="|${favorito.parqueo.espaciosDisponibles} espacios|">
+                                                10 espacios
+                                            </strong>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="detail-item">
+
+                                        <div class="detail-icon">
+                                            <i class="fa-solid fa-coins"></i>
+                                        </div>
+
+                                        <div>
+                                            <span>Tarifa por hora</span>
+
+                                            <strong th:text="|₡${#numbers.formatDecimal(
+                                                    favorito.parqueo.tarifaHora,
+                                                    1,
+                                                    'COMMA',
+                                                    2,
+                                                    'POINT'
+                                                    )}|">
+                                                ₡1,500.00
+                                            </strong>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- SERVICIOS -->
+                                <div class="parking-services">
+
+                                    <span th:if="${favorito.parqueo.techado}">
+                                        <i class="fa-solid fa-warehouse"></i>
+                                        Techado
+                                    </span>
+
+                                    <span th:if="${favorito.parqueo.seguridad24h}">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                        Seguridad 24/7
+                                    </span>
+
+                                    <span th:if="${favorito.parqueo.camaras}">
+                                        <i class="fa-solid fa-video"></i>
+                                        Cámaras
+                                    </span>
+
+                                    <span th:if="${favorito.parqueo.accesoDiscapacidad}">
+                                        <i class="fa-solid fa-wheelchair"></i>
+                                        Accesible
+                                    </span>
+
+                                </div>
+
+                                <!-- FECHA AGREGADA -->
+                                <p class="favorite-date"
+                                   th:if="${favorito.fechaAgregado != null}">
+
+                                    <i class="fa-regular fa-clock"></i>
+
+                                    Agregado el
+
+                                    <span th:text="${#temporals.format(
+                                          favorito.fechaAgregado,
+                                          'dd/MM/yyyy'
+                                          )}">
+                                        20/07/2026
+                                    </span>
+
+                                </p>
+
+                                <!-- ACCIONES -->
+                                <div class="favorite-card-actions">
+
+                                    <a th:href="@{/reservas/nueva(
+                                       idParqueo=${favorito.parqueo.idParqueo}
+                                       )}"
+                                       class="reserve-button"
+                                       th:classappend="${favorito.parqueo.espaciosDisponibles <= 0}
+                                       ? ' disabled'
+                                       : ''">
+
+                                        <i class="fa-regular fa-calendar-check"></i>
+                                        Reservar
+
+                                    </a>
+
+                                    <a th:href="@{/dashboard(
+                                       idParqueo=${favorito.parqueo.idParqueo}
+                                       )}"
+                                       class="route-button">
+
+                                        <i class="fa-solid fa-route"></i>
+                                        Ver en el mapa
+
+                                    </a>
+
+                                    <form th:action="@{/favoritos/eliminar/{idParqueo}(
+                                          idParqueo=${favorito.parqueo.idParqueo}
+                                          )}"
+                                          method="post"
+                                          class="remove-favorite-form">
+
+                                        <button type="submit"
+                                                class="remove-button">
+
+                                            <i class="fa-solid fa-heart-crack"></i>
+                                            Quitar
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+                    </div>
+
+                </section>
+
+                <!-- ESTADO VACÍO -->
+                <section class="empty-favorites"
+                         th:if="${favoritos == null or #lists.isEmpty(favoritos)}">
+
+                    <div class="empty-icon">
+
+                        <i class="fa-regular fa-heart"></i>
+
+                        <span>
+                            <i class="fa-solid fa-plus"></i>
+                        </span>
+
+                    </div>
+
+                    <h2>Aún no tienes parqueos favoritos</h2>
+
+                    <p>
+                        Explora los parqueos disponibles y guarda los que más
+                        te gusten para encontrarlos rápidamente.
+                    </p>
+
+                    <a th:href="@{/dashboard}"
+                       class="explore-button">
+
+                        <i class="fa-solid fa-magnifying-glass-location"></i>
+                        Explorar parqueos
+
+                    </a>
+
+                </section>
+
+            </main>
+
+        </div>
+
+        <!-- SCRIPTS GENERALES -->
+        <div th:replace="~{layout/fragmentos :: scripts}"></div>
+
+        <!-- CONFIRMACIÓN PARA ELIMINAR -->
+        <script>
+            document.querySelectorAll(".remove-favorite-form")
+                    .forEach(form => {
+
+                        form.addEventListener("submit", function (event) {
+
+                            event.preventDefault();
+
+                            Swal.fire({
+                                title: "¿Quitar de favoritos?",
+                                text: "Este parqueo dejará de aparecer en tu lista.",
+                                icon: "question",
+                                showCancelButton: true,
+                                confirmButtonText: "Sí, quitar",
+                                cancelButtonText: "Cancelar",
+                                reverseButtons: true,
+                                confirmButtonColor: "#ef4444"
+                            }).then(result => {
+
+                                if (result.isConfirmed) {
+                                    form.submit();
+                                }
+
+                            });
+
+                        });
+
+                    });
+        </script>
+
+    </body>
+</html>

@@ -1,15 +1,336 @@
 <!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
--->
-<html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <div>TODO write content</div>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{layout/fragmentos :: head('Mis reservas', 'reservas')}"></head>
+    <body class="dashboard-body">
+        <main class="dashboard-shell">
+
+            <!-- SIDEBAR -->
+            <aside th:replace="~{layout/fragmentos :: sidebar('reservas')}"></aside>
+
+            <section class="dashboard-main reservations-main">
+                <header class="reservations-header">
+                    <div>
+                        <p class="welcome-kicker">Gestión de estacionamiento</p>
+                        <h1>Mis reservas</h1>
+                        <p>Consulta tus próximas reservas y revisa tus movimientos recientes.</p>
+                    </div>
+                    <a th:href="@{/dashboard}" class="header-action"><i class="fa-solid fa-plus"></i>Buscar parqueo</a>
+                </header>
+
+                <section class="reservation-stats">
+                    <article>
+                        <div class="stat-icon active-icon">
+                            <i class="fa-regular fa-calendar-check"></i>
+                        </div>
+                        <div>
+                            <small>Reservas activas</small>
+                            <strong th:text="${#lists.size(reservasActivas)}">0</strong>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="stat-icon history-icon">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <div>
+                            <small>Historial</small>
+                            <strong th:text="${#lists.size(historial)}">0</strong>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="stat-icon time-icon">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <div>
+                            <small>Tiempo promedio</small>
+                            <strong th:text="${tiempoPromedio}">--</strong>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="stat-icon cancelled-icon">
+                            <i class="fa-solid fa-ban"></i>
+                        </div>
+                        <div>
+                            <small>Canceladas</small>
+                            <strong th:text="${reservasCanceladas}">0</strong>
+                        </div>
+                    </article>
+                </section>
+
+                <div class="reservations-layout">
+
+                    <div class="reservations-column">
+
+                        <section class="section-heading">
+                            <div>
+                                <span class="section-label">Próximas visitas</span>
+                                <h2>Reservas activas</h2>
+                            </div>
+
+                            <span class="status-badge status-active">
+
+                                <span class="status-dot"></span>
+
+                                <span th:text="${#lists.size(reservasActivas) == 1
+                                      ? '1 activa'
+                                      : #lists.size(reservasActivas) + ' activas'}">
+                                    0 activas
+                                </span>
+
+                            </span>
+                        </section>
+
+                        <div th:if="${#lists.isEmpty(reservasActivas)}">
+
+                            <article class="active-reservation-card">
+
+                                <h3>No tienes reservas activas</h3>
+
+                                <p>
+                                    Busca un parqueo y realiza tu primera reserva.
+                                </p>
+
+                                <a th:href="@{/dashboard}"
+                                   class="header-action">
+
+                                    Buscar parqueo
+
+                                </a>
+
+                            </article>
+
+                        </div>
+
+                        <div th:each="reserva : ${reservasActivas}">
+
+                            <article class="active-reservation-card">
+
+                                <div class="reservation-card-top">
+
+                                    <div class="parking-identity">
+
+                                        <div class="parking-symbol">
+                                            <i class="fa-solid fa-square-parking"></i>
+                                        </div>
+
+                                        <div>
+
+                                            <h3 th:text="${reserva.parqueo.nombre}">
+                                                Parqueo
+                                            </h3>
+
+                                            <p>
+
+                                                <i class="fa-solid fa-location-dot"></i>
+
+                                                <span th:text="${reserva.parqueo.direccion}">
+                                                    Dirección
+                                                </span>
+
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="reservation-code">
+
+                                        <small>Código de reserva</small>
+
+                                        <strong th:text="${reserva.codigoReserva}">
+                                            ESP
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="reservation-details">
+
+                                    <div>
+
+                                        <i class="fa-regular fa-calendar"></i>
+
+                                        <span>
+
+                                            <small>Fecha</small>
+
+                                            <strong th:text="${#temporals.format(reserva.fecha,'dd/MM/yyyy')}"></strong>
+
+                                        </span>
+
+                                    </div>
+
+                                    <div>
+
+                                        <i class="fa-regular fa-clock"></i>
+
+                                        <span>
+
+                                            <small>Horario</small>
+
+                                            <strong>
+
+                                                <span th:text="${#temporals.format(reserva.horaInicio,'HH:mm')}"></span>
+
+                                                -
+
+                                                <span th:text="${#temporals.format(reserva.horaSalida,'HH:mm')}"></span>
+
+                                            </strong>
+
+                                        </span>
+
+                                    </div>
+
+                                    <div>
+
+                                        <i class="fa-solid fa-car-side"></i>
+
+                                        <span>
+
+                                            <small>Espacio asignado</small>
+
+                                            <strong th:text="${reserva.espacioAsignado}"></strong>
+
+                                        </span>
+
+                                    </div>
+
+                                    <div>
+
+                                        <i class="fa-solid fa-wallet"></i>
+
+                                        <span>
+
+                                            <small>Total</small>
+
+                                            <strong th:text="'₡ ' + ${reserva.precioTotal}"></strong>
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="reservation-actions">
+
+                                    <a th:href="@{https://www.google.com/maps/dir/(
+                                       api=1,
+                                       destination=${reserva.parqueo.nombre + ', ' + reserva.parqueo.direccion}
+                                       )}"
+                                       class="route-action"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+
+                                        <i class="fa-solid fa-route"></i>
+                                        Ver ruta
+
+                                    </a>
+
+                                    <form th:action="@{/reservas/cancelar/{id}(id=${reserva.idReserva})}"
+                                          method="post"
+                                          class="form-cancelar-reserva">
+
+                                        <button class="cancel-action"
+                                                type="submit">
+
+                                            <i class="fa-regular fa-circle-xmark"></i>
+                                            Cancelar reserva
+
+                                        </button>
+                                    </form>
+
+                                </div>
+
+                            </article>
+
+                        </div>
+
+                        <section class="history-section">
+
+                            <div class="section-heading history-heading">
+
+                                <div>
+
+                                    <span class="section-label">
+
+                                        Movimientos recientes
+
+                                    </span>
+
+                                    <h2>Historial</h2>
+
+                                </div>
+
+                            </div>
+
+                            <div class="history-list">
+
+                                <div th:if="${#lists.isEmpty(historial)}">
+
+                                    <p>No hay historial.</p>
+
+                                </div>
+
+                                <article class="history-item"
+                                         th:each="r : ${historial}">
+
+                                    <div class="history-parking-icon">
+
+                                        <i class="fa-solid fa-square-parking"></i>
+
+                                    </div>
+
+                                    <div class="history-main">
+
+                                        <strong th:text="${r.parqueo.nombre}"></strong>
+
+                                        <span>
+
+                                            <span th:text="${#temporals.format(r.fecha,'dd/MM/yyyy')}"></span>
+
+                                        </span>
+
+                                    </div>
+
+                                    <div class="history-price">
+
+                                        <strong th:text="'₡ ' + ${r.precioTotal}"></strong>
+
+                                        <span class="status-badge"
+                                              th:text="${r.estado}"></span>
+
+                                    </div>
+
+                                </article>
+
+                            </div>
+
+                        </section>
+
+                    </div>
+
+                    <aside class="reservation-side-column">
+                        <section class="ai-reservation-card">
+                            <div class="ai-card-header"><div class="ai-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div><div><small>EasyBot AI</small><strong>Recomendación inteligente</strong></div></div>
+                            <p>El tráfico hacia La Sabana es moderado. Saliendo en los próximos 5 minutos llegarás con suficiente anticipación.</p>
+                            <div class="ai-time-row"><span><i class="fa-solid fa-car"></i>Viaje estimado</span><strong>8 min</strong></div>
+                            <div class="ai-time-row"><span><i class="fa-regular fa-clock"></i>Margen disponible</span><strong>10 min</strong></div>
+                        </section>
+
+                        <section class="quick-actions-card">
+                            <div class="card-title-row"><div><span class="section-label">Accesos rápidos</span><h3>¿Qué necesitas?</h3></div></div>
+                            <a th:href="@{/dashboard}"><span><i class="fa-solid fa-magnifying-glass-location"></i>Buscar otro parqueo</span><i class="fa-solid fa-chevron-right"></i></a>
+                            <a th:href="@{/reportes}"><span><i class="fa-solid fa-triangle-exclamation"></i>Reportar un problema</span><i class="fa-solid fa-chevron-right"></i></a>
+                            <a th:href="@{/perfil}"><span><i class="fa-regular fa-user"></i>Revisar mi perfil</span><i class="fa-solid fa-chevron-right"></i></a>
+                        </section>
+                    </aside>
+                </div>
+            </section>
+        </main>
+        <div th:replace="~{layout/fragmentos :: scripts}"></div>
     </body>
 </html>

@@ -5,6 +5,7 @@
 package com.easyspot.service;
 
 // Importes
+import com.easyspot.domain.Parqueo;
 import com.easyspot.dto.ParqueoDashboardDTO;
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,4 +19,6 @@ public interface ParqueoService {
     List<ParqueoDashboardDTO> buscarParaDashboard(String texto,BigDecimal precioMaximo,Integer espaciosMinimos,Boolean techado);
     Optional<ParqueoDashboardDTO> obtenerMejorOpcion(List<ParqueoDashboardDTO> resultados);
     int contarEspaciosDisponibles(List<ParqueoDashboardDTO> resultados);
+    Parqueo obtenerPorId(Long idParqueo);
+    Parqueo guardar(Parqueo parqueo);
 }

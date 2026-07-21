@@ -6,6 +6,7 @@ package com.easyspot.controller;
 
 // Importes
 import com.easyspot.dto.ParqueoDashboardDTO;
+import com.easyspot.service.FavoritoService;
 import com.easyspot.service.ParqueoService;
 import jakarta.servlet.http.HttpSession;
 import java.math.BigDecimal;
@@ -17,6 +18,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import com.easyspot.domain.Favorito;
+import com.easyspot.domain.Usuario;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -26,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class DashboardController {
 
     private final ParqueoService parqueoService;
+    private final FavoritoService favoritoService;
 
     /*
      * Se obtiene la API key de Google Maps desde application.properties.
@@ -33,8 +39,9 @@ public class DashboardController {
     @Value("${google.maps.api-key}")
     private String googleMapsApiKey;
 
-    public DashboardController(ParqueoService parqueoService) {
+    public DashboardController(ParqueoService parqueoService, FavoritoService favoritoService) {
         this.parqueoService = parqueoService;
+        this.favoritoService = favoritoService;
     }
 
     @GetMapping("/dashboard")
@@ -50,14 +57,17 @@ public class DashboardController {
             Model model) {
 
         /*
-         * Se verifica que el usuario haya iniciado sesión.
+     * Se verifica que el usuario haya iniciado sesión.
          */
-        if (session.getAttribute("usuarioLogueado") == null) {
+        Usuario usuario
+                = (Usuario) session.getAttribute("usuarioLogueado");
+
+        if (usuario == null) {
             return "redirect:/login";
         }
 
         /*
-         * Se consultan los parqueos aplicando los filtros recibidos.
+     * Se consultan los parqueos aplicando los filtros recibidos.
          */
         List<ParqueoDashboardDTO> resultados
                 = parqueoService.buscarParaDashboard(
@@ -68,9 +78,23 @@ public class DashboardController {
                 );
 
         /*
-         * Se envían los parqueos y los datos generales al dashboard.
+     * Se obtienen los parqueos favoritos del usuario.
+         */
+        List<Favorito> favoritos
+                = favoritoService.obtenerFavoritos(
+                        usuario.getIdUsuario()
+                );
+
+        Set<Long> favoritosIds = favoritos.stream()
+                .map(favorito
+                        -> favorito.getParqueo().getIdParqueo())
+                .collect(Collectors.toSet());
+
+        /*
+     * Se envían los parqueos y favoritos al dashboard.
          */
         model.addAttribute("parqueos", resultados);
+        model.addAttribute("favoritosIds", favoritosIds);
 
         model.addAttribute(
                 "mejorParqueo",
@@ -87,54 +111,47 @@ public class DashboardController {
                 resultados.size()
         );
 
-        /*
-         * Se mantienen los valores de los filtros en el formulario.
-         */
-        model.addAttribute("q", q);
-        model.addAttribute("precioMaximo", precioMaximo);
-        model.addAttribute("espaciosMinimos", espaciosMinimos);
-        model.addAttribute("techado", techado);
-
-        /*
-         * Si no se seleccionó una fecha, se utiliza la fecha actual.
-         */
-        model.addAttribute(
-                "fechaSeleccionada",
-                fecha != null
-                        ? fecha
-                        : LocalDate.now()
-        );
-
-        /*
-         * Si no se seleccionó una hora de inicio,
-         * se utiliza las 2:00 p. m.
-         */
-        model.addAttribute(
-                "horaInicioSeleccionada",
-                horaInicio != null
-                        ? horaInicio
-                        : LocalTime.of(14, 0)
-        );
-
-        /*
-         * Si no se seleccionó una hora de salida,
-         * se utiliza las 5:00 p. m.
-         */
-        model.addAttribute(
-                "horaSalidaSeleccionada",
-                horaSalida != null
-                        ? horaSalida
-                        : LocalTime.of(17, 0)
-        );
-
-        /*
-         * Se envía la API key de Google Maps a dashboard.html.
-         */
         model.addAttribute(
                 "googleMapsApiKey",
                 googleMapsApiKey
         );
 
+        // Mantén aquí el resto de tus atributos actuales.
         return "dashboard";
+    }
+
+    private boolean noLogueado(HttpSession session) {
+        return session.getAttribute("usuarioLogueado") == null;
+    }
+
+    @GetMapping("/")
+    public String landing() {
+        return "index";
+    }
+
+    @GetMapping("/reportes")
+    public String reportes(HttpSession session) {
+        if (noLogueado(session)) {
+            return "redirect:/login";
+        }
+        return "reportes";
+    }
+
+    @GetMapping("/perfil")
+    public String perfil(HttpSession session) {
+        if (noLogueado(session)) {
+            return "redirect:/login";
+        }
+        return "perfil";
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
+    @GetMapping("/registro")
+    public String registro() {
+        return "registro";
     }
 }
