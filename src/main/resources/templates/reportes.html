@@ -1,15 +1,2067 @@
 <!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
--->
-<html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{layout/fragmentos :: head(
+          'Reportes comunitarios | EasySpot AI',
+          'reportes'
+          )}">
     </head>
+
     <body>
-        <div>TODO write content</div>
+
+        <div class="dashboard-shell">
+
+            <!-- =====================================================
+                 SIDEBAR
+                 ===================================================== -->
+            <aside th:replace="~{layout/fragmentos :: sidebar('reportes')}">
+            </aside>
+
+            <!-- =====================================================
+                 CONTENIDO PRINCIPAL
+                 ===================================================== -->
+            <main class="reports-main">
+
+                <!-- Fondo decorativo -->
+                <div class="reports-background"
+                     aria-hidden="true">
+
+                    <span class="reports-orb reports-orb-one"></span>
+                    <span class="reports-orb reports-orb-two"></span>
+                    <span class="reports-orb reports-orb-three"></span>
+                    <span class="reports-grid-background"></span>
+
+                </div>
+
+                <div class="reports-container">
+
+                    <!-- =================================================
+                         HERO
+                         ================================================= -->
+                    <header class="reports-hero"
+                            data-animation="fade-up">
+
+                        <div class="reports-hero-content">
+
+                            <span class="reports-eyebrow">
+
+                                <span class="reports-eyebrow-pulse"></span>
+
+                                <i class="fa-solid fa-users-viewfinder"></i>
+
+                                Comunidad EasySpot en tiempo real
+
+                            </span>
+
+                            <h1>
+                                Reportes
+                                <span>comunitarios</span>
+                            </h1>
+
+                            <p>
+                                Comparte incidentes, valida información y ayuda
+                                a otros conductores a tomar mejores decisiones
+                                antes de llegar a su parqueo.
+                            </p>
+
+                            <div class="reports-hero-features">
+
+                                <span>
+                                    <i class="fa-solid fa-bolt"></i>
+                                    Información inmediata
+                                </span>
+
+                                <span>
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                    Validación comunitaria
+                                </span>
+
+                                <span>
+                                    <i class="fa-solid fa-location-crosshairs"></i>
+                                    Ubicación precisa
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="reports-hero-actions">
+
+                            <button type="button"
+                                    class="reports-create-button"
+                                    id="openReportModal">
+
+                                <span class="reports-create-icon">
+                                    <i class="fa-solid fa-plus"></i>
+                                </span>
+
+                                <span>
+                                    <small>Ayuda a la comunidad</small>
+                                    <strong>Crear nuevo reporte</strong>
+                                </span>
+
+                                <i class="fa-solid fa-arrow-right"></i>
+
+                            </button>
+
+                            <div class="reports-live-status">
+
+                                <span class="reports-live-icon">
+
+                                    <span class="reports-live-pulse"></span>
+
+                                    <i class="fa-solid fa-satellite-dish"></i>
+
+                                </span>
+
+                                <div>
+                                    <small>Estado de la comunidad</small>
+                                    <strong>Monitoreo activo</strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </header>
+
+                    <!-- =================================================
+                         ALERTAS
+                         ================================================= -->
+                    <section class="reports-alerts">
+
+                        <div class="reports-alert reports-alert-success"
+                             th:if="${param.creado}">
+
+                            <span class="reports-alert-icon">
+
+                                <i class="fa-solid fa-circle-check"></i>
+
+                            </span>
+
+                            <div>
+
+                                <strong>Reporte publicado correctamente</strong>
+
+                                <p>
+                                    Tu reporte ya está visible para la comunidad.
+                                </p>
+
+                            </div>
+
+                            <button type="button"
+                                    class="reports-alert-close"
+                                    aria-label="Cerrar mensaje">
+
+                                <i class="fa-solid fa-xmark"></i>
+
+                            </button>
+
+                        </div>
+
+                        <div class="reports-alert reports-alert-info"
+                             th:if="${param.actualizado}">
+
+                            <span class="reports-alert-icon">
+
+                                <i class="fa-solid fa-circle-info"></i>
+
+                            </span>
+
+                            <div>
+
+                                <strong>Reporte actualizado</strong>
+
+                                <p>
+                                    El estado del incidente fue actualizado.
+                                </p>
+
+                            </div>
+
+                            <button type="button"
+                                    class="reports-alert-close"
+                                    aria-label="Cerrar mensaje">
+
+                                <i class="fa-solid fa-xmark"></i>
+
+                            </button>
+
+                        </div>
+
+                    </section>
+
+                    <!-- =================================================
+                         ESTADÍSTICAS
+                         ================================================= -->
+                    <section class="reports-stats"
+                             aria-label="Resumen de reportes">
+
+                        <!-- Activos -->
+                        <article class="reports-stat-card"
+                                 data-animation="fade-up">
+
+                            <div class="reports-stat-header">
+
+                                <span class="reports-stat-icon reports-stat-icon-red">
+
+                                    <i class="fa-solid fa-tower-broadcast"></i>
+
+                                </span>
+
+                                <span class="reports-stat-badge reports-stat-badge-red">
+
+                                    <i class="fa-solid fa-circle"></i>
+                                    En vivo
+
+                                </span>
+
+                            </div>
+
+                            <div class="reports-stat-value"
+                                 th:text="${reportesActivos != null
+                                 ? reportesActivos
+                                 : 0}">
+
+                                0
+
+                            </div>
+
+                            <h2>Reportes activos</h2>
+
+                            <p>
+                                Incidentes que todavía afectan a conductores.
+                            </p>
+
+                            <span class="reports-stat-decoration"></span>
+
+                        </article>
+
+                        <!-- Prioridad alta -->
+                        <article class="reports-stat-card"
+                                 data-animation="fade-up">
+
+                            <div class="reports-stat-header">
+
+                                <span class="reports-stat-icon reports-stat-icon-orange">
+
+                                    <i class="fa-solid fa-fire-flame-curved"></i>
+
+                                </span>
+
+                                <span class="reports-stat-badge reports-stat-badge-orange">
+
+                                    <i class="fa-solid fa-arrow-trend-up"></i>
+                                    Atención
+
+                                </span>
+
+                            </div>
+
+                            <div class="reports-stat-value"
+                                 th:text="${reportesCriticos != null
+                                 ? reportesCriticos
+                                 : 0}">
+
+                                0
+
+                            </div>
+
+                            <h2>Alta prioridad</h2>
+
+                            <p>
+                                Reportes que requieren atención inmediata.
+                            </p>
+
+                            <span class="reports-stat-decoration"></span>
+
+                        </article>
+
+                        <!-- Hoy -->
+                        <article class="reports-stat-card"
+                                 data-animation="fade-up">
+
+                            <div class="reports-stat-header">
+
+                                <span class="reports-stat-icon reports-stat-icon-blue">
+
+                                    <i class="fa-solid fa-users"></i>
+
+                                </span>
+
+                                <span class="reports-stat-badge reports-stat-badge-blue">
+
+                                    <i class="fa-regular fa-clock"></i>
+                                    Hoy
+
+                                </span>
+
+                            </div>
+
+                            <div class="reports-stat-value"
+                                 th:text="${reportesHoy != null
+                                 ? reportesHoy
+                                 : 0}">
+
+                                0
+
+                            </div>
+
+                            <h2>Participación de hoy</h2>
+
+                            <p>
+                                Reportes compartidos durante las últimas horas.
+                            </p>
+
+                            <span class="reports-stat-decoration"></span>
+
+                        </article>
+
+                        <!-- Resueltos -->
+                        <article class="reports-stat-card"
+                                 data-animation="fade-up">
+
+                            <div class="reports-stat-header">
+
+                                <span class="reports-stat-icon reports-stat-icon-green">
+
+                                    <i class="fa-solid fa-circle-check"></i>
+
+                                </span>
+
+                                <span class="reports-stat-badge reports-stat-badge-green">
+
+                                    <i class="fa-solid fa-check"></i>
+                                    Solucionados
+
+                                </span>
+
+                            </div>
+
+                            <div class="reports-stat-value"
+                                 th:text="${reportesResueltos != null
+                                 ? reportesResueltos
+                                 : 0}">
+
+                                0
+
+                            </div>
+
+                            <h2>Reportes resueltos</h2>
+
+                            <p>
+                                Incidentes solucionados con ayuda comunitaria.
+                            </p>
+
+                            <span class="reports-stat-decoration"></span>
+
+                        </article>
+
+                    </section>
+
+                    <!-- =================================================
+                         BARRA DE BÚSQUEDA Y FILTROS
+                         ================================================= -->
+                    <section class="reports-toolbar"
+                             data-animation="fade-up">
+
+                        <div class="reports-search">
+
+                            <i class="fa-solid fa-magnifying-glass"></i>
+
+                            <input type="text"
+                                   id="reportsSearch"
+                                   placeholder="Buscar por título, parqueo, ubicación o descripción..."
+                                   autocomplete="off"
+                                   aria-label="Buscar reportes">
+
+                            <button type="button"
+                                    id="clearReportsSearch"
+                                    class="reports-search-clear"
+                                    aria-label="Limpiar búsqueda"
+                                    hidden>
+
+                                <i class="fa-solid fa-xmark"></i>
+
+                            </button>
+
+                        </div>
+
+                        <div class="reports-filter-row">
+
+                            <div class="reports-filter-group"
+                                 role="group"
+                                 aria-label="Filtrar reportes por tipo">
+
+                                <button type="button"
+                                        class="reports-filter active"
+                                        data-filter="TODOS">
+
+                                    <i class="fa-solid fa-layer-group"></i>
+                                    Todos
+
+                                    <span th:text="${reportes != null
+                                          ? #lists.size(reportes)
+                                          : 0}">
+
+                                        0
+
+                                    </span>
+
+                                </button>
+
+                                <button type="button"
+                                        class="reports-filter"
+                                        data-filter="ACCIDENTE">
+
+                                    <i class="fa-solid fa-car-burst"></i>
+                                    Accidentes
+
+                                </button>
+
+                                <button type="button"
+                                        class="reports-filter"
+                                        data-filter="SEGURIDAD">
+
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                    Seguridad
+
+                                </button>
+
+                                <button type="button"
+                                        class="reports-filter"
+                                        data-filter="PARQUEO_LLENO">
+
+                                    <i class="fa-solid fa-square-parking"></i>
+                                    Parqueo lleno
+
+                                </button>
+
+                                <button type="button"
+                                        class="reports-filter"
+                                        data-filter="ESPACIO_BLOQUEADO">
+
+                                    <i class="fa-solid fa-ban"></i>
+                                    Espacio bloqueado
+
+                                </button>
+
+                                <button type="button"
+                                        class="reports-filter"
+                                        data-filter="OBRAS">
+
+                                    <i class="fa-solid fa-person-digging"></i>
+                                    Obras
+
+                                </button>
+
+                                <button type="button"
+                                        class="reports-filter"
+                                        data-filter="TRAFICO">
+
+                                    <i class="fa-solid fa-road"></i>
+                                    Tráfico
+
+                                </button>
+
+                                <button type="button"
+                                        class="reports-filter"
+                                        data-filter="OTRO">
+
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                    Otros
+
+                                </button>
+
+                            </div>
+
+                            <div class="reports-toolbar-controls">
+
+                                <label class="reports-sort">
+
+                                    <span>
+                                        <i class="fa-solid fa-arrow-down-wide-short"></i>
+                                        Ordenar
+                                    </span>
+
+                                    <select id="reportsSort"
+                                            aria-label="Ordenar reportes">
+
+                                        <option value="RECIENTES">
+                                            Más recientes
+                                        </option>
+
+                                        <option value="PRIORIDAD">
+                                            Mayor prioridad
+                                        </option>
+
+                                        <option value="VOTOS">
+                                            Más validados
+                                        </option>
+
+                                        <option value="CONFIANZA">
+                                            Mayor confianza
+                                        </option>
+
+                                    </select>
+
+                                </label>
+
+                                <div class="reports-view-control">
+
+                                    <button type="button"
+                                            class="reports-view-button active"
+                                            data-view="grid"
+                                            aria-label="Vista de tarjetas">
+
+                                        <i class="fa-solid fa-table-cells-large"></i>
+
+                                    </button>
+
+                                    <button type="button"
+                                            class="reports-view-button"
+                                            data-view="list"
+                                            aria-label="Vista de lista">
+
+                                        <i class="fa-solid fa-list"></i>
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <!-- =================================================
+                         CONTENIDO PRINCIPAL
+                         ================================================= -->
+                    <section class="reports-content">
+
+                        <!-- =============================================
+                             FEED DE REPORTES
+                             ============================================= -->
+                        <div class="reports-feed">
+
+                            <div class="reports-section-header">
+
+                                <div>
+
+                                    <span class="reports-section-kicker">
+
+                                        <span class="reports-section-dot"></span>
+
+                                        Actividad comunitaria
+
+                                    </span>
+
+                                    <h2>Reportes recientes</h2>
+
+                                    <p>
+                                        Información validada por conductores
+                                        de EasySpot.
+                                    </p>
+
+                                </div>
+
+                                <div class="reports-results-counter">
+
+                                    <strong id="visibleReportsCount"
+                                            th:text="${reportes != null
+                                            ? #lists.size(reportes)
+                                            : 0}">
+
+                                        0
+
+                                    </strong>
+
+                                    <span>reportes</span>
+
+                                </div>
+
+                            </div>
+
+                            <!-- =========================================
+                                 LISTADO DE REPORTES
+                                 ========================================= -->
+                            <div id="reportsResults"
+                                 class="reports-grid"
+                                 th:if="${reportes != null
+                                 and !#lists.isEmpty(reportes)}">
+
+                                <article class="report-card"
+                                         th:each="reporte, iteracion : ${reportes}"
+                                         th:data-id="${reporte.idReporte}"
+                                         th:data-type="${reporte.tipo != null
+                                         ? reporte.tipo.name()
+                                         : 'OTRO'}"
+                                         th:data-status="${reporte.estado != null
+                                         ? reporte.estado.name()
+                                         : 'ACTIVO'}"
+                                         th:data-priority="${reporte.prioridad != null
+                                         ? reporte.prioridad.name()
+                                         : 'MEDIA'}"
+                                         th:data-title="${reporte.titulo}"
+                                         th:data-location="${reporte.ubicacion}"
+                                         th:data-positive-votes="${reporte.votosPositivos != null
+                                         ? reporte.votosPositivos
+                                         : 0}"
+                                         th:data-negative-votes="${reporte.votosNegativos != null
+                                         ? reporte.votosNegativos
+                                         : 0}"
+                                         th:data-index="${iteracion.index}"
+                                         data-animation="report-card">
+
+                                    <!-- Cabecera visual -->
+                                    <div class="report-card-visual"
+                                         th:classappend="${reporte.tipo != null
+                                         ? ' report-type-'
+                                         + #strings.toLowerCase(
+                                         reporte.tipo.name()
+                                         )
+                                         : ' report-type-otro'}">
+
+                                        <div class="report-card-pattern"></div>
+
+                                        <span class="report-type-icon"
+                                              th:switch="${reporte.tipo != null ? reporte.tipo.name() : 'OTRO'}">
+
+                                            <i th:case="'ACCIDENTE'"
+                                               class="fa-solid fa-car-burst"></i>
+
+                                            <i th:case="'SEGURIDAD'"
+                                               class="fa-solid fa-shield-halved"></i>
+
+                                            <i th:case="'PARQUEO_LLENO'"
+                                               class="fa-solid fa-square-parking"></i>
+
+                                            <i th:case="'ESPACIO_BLOQUEADO'"
+                                               class="fa-solid fa-ban"></i>
+
+                                            <i th:case="'OBRAS'"
+                                               class="fa-solid fa-person-digging"></i>
+
+                                            <i th:case="'TRAFICO'"
+                                               class="fa-solid fa-road"></i>
+
+                                            <i th:case="*"
+                                               class="fa-solid fa-circle-exclamation"></i>
+
+                                        </span>
+
+                                        <!-- Tipo -->
+                                        <span class="report-type-badge"
+                                              th:text="${reporte.tipo != null
+                                              ? #strings.replace(
+                                              reporte.tipo.name(),
+                                              '_',
+                                              ' '
+                                              )
+                                              : 'OTRO'}">
+
+                                            Tipo de reporte
+
+                                        </span>
+
+                                        <!-- Prioridad -->
+                                        <span class="report-priority-badge"
+                                              th:classappend="${reporte.prioridad != null
+                                              ? ' priority-'
+                                              + #strings.toLowerCase(
+                                              reporte.prioridad.name()
+                                              )
+                                              : ' priority-media'}">
+
+                                            <i class="fa-solid fa-triangle-exclamation"></i>
+
+                                            <span th:text="${reporte.prioridad != null
+                                                  ? #strings.capitalize(
+                                                  #strings.toLowerCase(
+                                                  reporte.prioridad.name()
+                                                  )
+                                                  )
+                                                  : 'Media'}">
+
+                                                Media
+
+                                            </span>
+
+                                        </span>
+
+                                        <!-- Estado -->
+                                        <span th:switch="${reporte.estado != null ? reporte.estado.name() : 'ACTIVO'}">
+
+                                            <i th:case="'RESUELTO'"
+                                               class="fa-solid fa-circle-check"></i>
+
+                                            <i th:case="'EN_REVISION'"
+                                               class="fa-solid fa-magnifying-glass"></i>
+
+                                            <i th:case="'DESCARTADO'"
+                                               class="fa-solid fa-circle-xmark"></i>
+
+                                            <i th:case="*"
+                                               class="fa-solid fa-signal"></i>
+
+                                        </span>
+
+                                    </div>
+
+                                    <!-- Contenido -->
+                                    <div class="report-card-content">
+
+                                        <div class="report-card-meta">
+
+                                            <span class="report-time">
+
+                                                <i class="fa-regular fa-clock"></i>
+
+                                                <span class="relative-time"
+                                                      th:data-date="${reporte.fechaCreacion}"
+                                                      th:text="${reporte.fechaCreacion != null
+                                                      ? #temporals.format(
+                                                      reporte.fechaCreacion,
+                                                      'dd/MM/yyyy HH:mm'
+                                                      )
+                                                      : 'Hace unos momentos'}">
+
+                                                    Hace 5 minutos
+
+                                                </span>
+
+                                            </span>
+
+                                            <span class="report-code"
+                                                  th:if="${reporte.idReporte != null}">
+
+                                                #REP-<span th:text="${reporte.idReporte}">
+                                                    001
+                                                </span>
+
+                                            </span>
+
+                                        </div>
+
+                                        <h3 th:text="${reporte.titulo != null
+                                            ? reporte.titulo
+                                            : 'Reporte comunitario'}">
+
+                                            Espacio bloqueado
+
+                                        </h3>
+
+                                        <div class="report-location">
+
+                                            <span class="report-location-icon">
+
+                                                <i class="fa-solid fa-location-dot"></i>
+
+                                            </span>
+
+                                            <div>
+
+                                                <strong th:text="${reporte.parqueo != null
+                                                        ? reporte.parqueo.nombre
+                                                        : 'Ubicación reportada'}">
+
+                                                    Parqueo Torre Sabana
+
+                                                </strong>
+
+                                                <small
+                                                    th:if="${reporte.ubicacion != null and !#strings.isEmpty(reporte.ubicacion)}"
+                                                    th:text="${reporte.ubicacion}">
+                                                </small>
+
+                                                <small
+                                                    th:if="${(reporte.ubicacion == null or #strings.isEmpty(reporte.ubicacion)) and reporte.parqueo != null}"
+                                                    th:text="${reporte.parqueo.direccion}">
+                                                </small>
+
+                                                <small
+                                                    th:if="${(reporte.ubicacion == null or #strings.isEmpty(reporte.ubicacion)) and reporte.parqueo == null}">
+                                                    Ubicación no disponible
+                                                </small>
+
+                                            </div>
+
+                                        </div>
+
+                                        <p class="report-description"
+                                           th:text="${reporte.descripcion != null
+                                           ? reporte.descripcion
+                                           : 'Sin descripción adicional.'}">
+
+                                            Vehículo estacionado bloqueando
+                                            parcialmente la salida principal.
+
+                                        </p>
+
+                                        <!-- Imagen opcional -->
+                                        <div class="report-image"
+                                             th:if="${reporte.imagenUrl != null
+                                             and !#strings.isEmpty(
+                                             reporte.imagenUrl
+                                             )}">
+
+                                            <img th:src="${reporte.imagenUrl}"
+                                                 th:alt="${'Evidencia del reporte '
+                                                 + reporte.titulo}"
+                                                 loading="lazy">
+
+                                            <button type="button"
+                                                    class="report-image-open"
+                                                    th:data-image="${reporte.imagenUrl}"
+                                                    aria-label="Ampliar imagen">
+
+                                                <i class="fa-solid fa-expand"></i>
+
+                                            </button>
+
+                                        </div>
+
+                                        <!-- Usuario -->
+                                        <div class="report-user">
+
+                                            <span class="report-user-avatar">
+
+                                                <span th:text="${reporte.usuario != null
+                                                      and reporte.usuario.nombre != null
+                                                      ? #strings.substring(
+                                                      reporte.usuario.nombre,
+                                                      0,
+                                                      1
+                                                      )
+                                                      : 'E'}">
+
+                                                    J
+
+                                                </span>
+
+                                            </span>
+
+                                            <div>
+
+                                                <strong th:text="${reporte.usuario != null
+                                                        ? reporte.usuario.nombre
+                                                        : 'Usuario EasySpot'}">
+
+                                                    Julián Quesada
+
+                                                </strong>
+
+                                                <small>
+                                                    <i class="fa-solid fa-circle-check"></i>
+                                                    Miembro de la comunidad
+                                                </small>
+
+                                            </div>
+
+                                            <span class="report-user-score"
+                                                  title="Contribución comunitaria">
+
+                                                <i class="fa-solid fa-award"></i>
+
+                                                <span th:text="${reporte.usuario != null
+                                                      and reporte.usuario.idUsuario != null
+                                                      ? 'Contribuidor'
+                                                      : 'Comunidad'}">
+
+                                                    Contribuidor
+
+                                                </span>
+
+                                            </span>
+
+                                        </div>
+
+                                        <!-- Confianza -->
+                                        <div class="report-confidence">
+
+                                            <div class="report-confidence-header">
+
+                                                <span>
+
+                                                    <i class="fa-solid fa-shield-heart"></i>
+
+                                                    Confianza comunitaria
+
+                                                </span>
+
+                                                <strong class="report-confidence-value"
+                                                        th:text="${reporte.porcentajeConfianza != null
+                                                        ? reporte.porcentajeConfianza
+                                                        + '%'
+                                                        : '50%'}">
+
+                                                    94%
+
+                                                </strong>
+
+                                            </div>
+
+                                            <div class="report-confidence-track">
+
+                                                <span class="report-confidence-progress"
+                                                      th:style="${reporte.porcentajeConfianza != null
+                                                      ? 'width: '
+                                                      + reporte.porcentajeConfianza
+                                                      + '%'
+                                                      : 'width: 50%'}">
+
+                                                </span>
+
+                                            </div>
+
+                                            <small>
+                                                Basado en las validaciones
+                                                de otros conductores.
+                                            </small>
+
+                                        </div>
+
+                                        <!-- Acciones -->
+                                        <div class="report-card-footer">
+
+                                            <div class="report-voting"
+                                                 th:data-report-id="${reporte.idReporte}">
+
+                                                <button type="button"
+                                                        class="report-vote-button report-vote-up"
+                                                        th:data-report-id="${reporte.idReporte}"
+                                                        data-vote="positive"
+                                                        aria-label="Confirmar reporte">
+
+                                                    <i class="fa-solid fa-arrow-up"></i>
+
+                                                </button>
+
+                                                <strong class="report-vote-score"
+                                                        th:text="${(reporte.votosPositivos != null
+                                                        ? reporte.votosPositivos
+                                                        : 0)
+                                                        -
+                                                        (reporte.votosNegativos != null
+                                                        ? reporte.votosNegativos
+                                                        : 0)}">
+
+                                                    0
+
+                                                </strong>
+
+                                                <button type="button"
+                                                        class="report-vote-button report-vote-down"
+                                                        th:data-report-id="${reporte.idReporte}"
+                                                        data-vote="negative"
+                                                        aria-label="Indicar que el reporte no es correcto">
+
+                                                    <i class="fa-solid fa-arrow-down"></i>
+
+                                                </button>
+
+                                            </div>
+
+                                            <div class="report-actions">
+
+                                                <a th:if="${reporte.parqueo != null}"
+                                                   th:href="@{/dashboard(
+                                                   idParqueo=${reporte.parqueo.idParqueo}
+                                                   )}"
+                                                   class="report-action-secondary">
+
+                                                    <i class="fa-solid fa-map-location-dot"></i>
+                                                    Ver ubicación
+
+                                                </a>
+
+                                                <button type="button"
+                                                        class="report-action-share"
+                                                        th:data-report-id="${reporte.idReporte}"
+                                                        th:data-title="${reporte.titulo}"
+                                                        aria-label="Compartir reporte">
+
+                                                    <i class="fa-solid fa-share-nodes"></i>
+
+                                                </button>
+
+                                                <button type="button"
+                                                        class="report-action-menu"
+                                                        th:data-report-id="${reporte.idReporte}"
+                                                        aria-label="Más opciones">
+
+                                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+
+                                                </button>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </article>
+
+                            </div>
+
+                            <!-- =========================================
+                                 ESTADO VACÍO
+                                 ========================================= -->
+                            <div class="reports-empty"
+                                 th:if="${reportes == null
+                                 or #lists.isEmpty(reportes)}">
+
+                                <div class="reports-empty-visual">
+
+                                    <span class="reports-empty-ring reports-ring-one"></span>
+                                    <span class="reports-empty-ring reports-ring-two"></span>
+
+                                    <div class="reports-empty-icon">
+
+                                        <i class="fa-solid fa-users-viewfinder"></i>
+
+                                    </div>
+
+                                    <span class="reports-empty-floating reports-floating-warning">
+
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                                    </span>
+
+                                    <span class="reports-empty-floating reports-floating-location">
+
+                                        <i class="fa-solid fa-location-dot"></i>
+
+                                    </span>
+
+                                </div>
+
+                                <span class="reports-empty-eyebrow">
+                                    Comunidad sin incidentes
+                                </span>
+
+                                <h2>No hay reportes comunitarios todavía</h2>
+
+                                <p>
+                                    Sé la primera persona en compartir
+                                    información útil con otros conductores.
+                                </p>
+
+                                <button type="button"
+                                        class="reports-empty-button"
+                                        data-open-report-modal>
+
+                                    <i class="fa-solid fa-plus"></i>
+                                    Crear el primer reporte
+                                    <i class="fa-solid fa-arrow-right"></i>
+
+                                </button>
+
+                            </div>
+
+                            <!-- =========================================
+                                 SIN RESULTADOS DE BÚSQUEDA
+                                 ========================================= -->
+                            <div id="reportsNoResults"
+                                 class="reports-empty reports-empty-search"
+                                 hidden>
+
+                                <div class="reports-empty-visual reports-empty-compact">
+
+                                    <div class="reports-empty-icon">
+
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                                    </div>
+
+                                </div>
+
+                                <span class="reports-empty-eyebrow">
+                                    Sin coincidencias
+                                </span>
+
+                                <h2>No encontramos reportes</h2>
+
+                                <p>
+                                    Prueba con otra palabra, ubicación
+                                    o categoría.
+                                </p>
+
+                                <button type="button"
+                                        id="resetReportsFilters"
+                                        class="reports-empty-button">
+
+                                    <i class="fa-solid fa-rotate-left"></i>
+                                    Restablecer filtros
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        <!-- =============================================
+                             PANEL LATERAL
+                             ============================================= -->
+                        <aside class="reports-side-panel">
+
+                            <!-- Pulso comunitario -->
+                            <article class="community-pulse-card"
+                                     data-animation="fade-up">
+
+                                <div class="community-pulse-header">
+
+                                    <div>
+
+                                        <span class="reports-section-kicker">
+                                            Inteligencia comunitaria
+                                        </span>
+
+                                        <h2>Pulso de la ciudad</h2>
+
+                                    </div>
+
+                                    <span class="community-live-badge">
+
+                                        <span></span>
+                                        En vivo
+
+                                    </span>
+
+                                </div>
+
+                                <div class="community-pulse-visual">
+
+                                    <div class="pulse-radar">
+
+                                        <span class="pulse-radar-circle circle-one"></span>
+                                        <span class="pulse-radar-circle circle-two"></span>
+                                        <span class="pulse-radar-circle circle-three"></span>
+
+                                        <span class="pulse-radar-center">
+
+                                            <i class="fa-solid fa-location-crosshairs"></i>
+
+                                        </span>
+
+                                        <span class="pulse-radar-point point-one"></span>
+                                        <span class="pulse-radar-point point-two"></span>
+                                        <span class="pulse-radar-point point-three"></span>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="community-pulse-stats">
+
+                                    <div>
+
+                                        <small>Zona más activa</small>
+
+                                        <strong th:text="${zonaMasActiva != null
+                                                ? zonaMasActiva
+                                                : 'Sin información'}">
+
+                                            San José centro
+
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <small>Tipo frecuente</small>
+
+                                        <strong th:text="${tipoMasFrecuente != null
+                                                ? tipoMasFrecuente
+                                                : 'Sin información'}">
+
+                                            Parqueo lleno
+
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <small>Última hora</small>
+
+                                        <strong th:text="${reportesUltimaHora != null
+                                                ? reportesUltimaHora
+                                                + ' reportes'
+                                                : '0 reportes'}">
+
+                                            0 reportes
+
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <!-- Guía de prioridad -->
+                            <article class="priority-guide-card"
+                                     data-animation="fade-up">
+
+                                <div class="side-card-header">
+
+                                    <span class="side-card-icon">
+
+                                        <i class="fa-solid fa-ranking-star"></i>
+
+                                    </span>
+
+                                    <div>
+
+                                        <span>Clasificación inteligente</span>
+                                        <h2>Niveles de prioridad</h2>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="priority-guide-list">
+
+                                    <div class="priority-guide-item">
+
+                                        <span class="priority-guide-dot priority-critical"></span>
+
+                                        <div>
+                                            <strong>Crítica</strong>
+                                            <small>
+                                                Riesgo inmediato o accidente.
+                                            </small>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="priority-guide-item">
+
+                                        <span class="priority-guide-dot priority-high"></span>
+
+                                        <div>
+                                            <strong>Alta</strong>
+                                            <small>
+                                                Seguridad o acceso bloqueado.
+                                            </small>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="priority-guide-item">
+
+                                        <span class="priority-guide-dot priority-medium"></span>
+
+                                        <div>
+                                            <strong>Media</strong>
+                                            <small>
+                                                Parqueo lleno, tráfico u obras.
+                                            </small>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="priority-guide-item">
+
+                                        <span class="priority-guide-dot priority-low"></span>
+
+                                        <div>
+                                            <strong>Baja</strong>
+                                            <small>
+                                                Información preventiva.
+                                            </small>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <!-- Consejos -->
+                            <article class="community-tips-card"
+                                     data-animation="fade-up">
+
+                                <div class="side-card-header">
+
+                                    <span class="side-card-icon side-card-icon-green">
+
+                                        <i class="fa-solid fa-lightbulb"></i>
+
+                                    </span>
+
+                                    <div>
+
+                                        <span>Buenas prácticas</span>
+                                        <h2>Reporta responsablemente</h2>
+
+                                    </div>
+
+                                </div>
+
+                                <ul>
+
+                                    <li>
+
+                                        <i class="fa-solid fa-check"></i>
+
+                                        Describe el incidente con claridad.
+
+                                    </li>
+
+                                    <li>
+
+                                        <i class="fa-solid fa-check"></i>
+
+                                        Selecciona una ubicación precisa.
+
+                                    </li>
+
+                                    <li>
+
+                                        <i class="fa-solid fa-check"></i>
+
+                                        Evita incluir datos personales.
+
+                                    </li>
+
+                                    <li>
+
+                                        <i class="fa-solid fa-check"></i>
+
+                                        Actualiza el reporte cuando se resuelva.
+
+                                    </li>
+
+                                </ul>
+
+                            </article>
+
+                        </aside>
+
+                    </section>
+
+                    <!-- =================================================
+                         EASYBOT INSIGHT
+                         ================================================= -->
+                    <section class="reports-insight"
+                             data-animation="fade-up">
+
+                        <div class="reports-insight-avatar">
+
+                            <span class="reports-insight-pulse"></span>
+
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+                        </div>
+
+                        <div class="reports-insight-content">
+
+                            <span>EasyBot Community Insight</span>
+
+                            <h2>
+                                La comunidad convierte datos en decisiones
+                            </h2>
+
+                            <p th:if="${insightComunitario == null}">
+                                A medida que los conductores compartan y
+                                validen reportes, EasyBot identificará zonas
+                                con mayor actividad y sugerirá rutas o
+                                parqueos alternativos.
+                            </p>
+
+                            <p th:if="${insightComunitario != null}"
+                               th:text="${insightComunitario}">
+
+                                Insight generado por EasyBot.
+
+                            </p>
+
+                        </div>
+
+                        <button type="button"
+                                class="reports-insight-action"
+                                data-open-report-modal>
+
+                            Crear reporte
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </button>
+
+                    </section>
+
+                </div>
+
+            </main>
+
+        </div>
+
+        <!-- =========================================================
+             MODAL: CREAR REPORTE
+             ========================================================= -->
+        <div class="report-modal"
+             id="reportModal"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="reportModalTitle"
+             aria-hidden="true">
+
+            <div class="report-modal-backdrop"
+                 data-close-report-modal>
+            </div>
+
+            <div class="report-modal-dialog">
+
+                <div class="report-modal-header">
+
+                    <div class="report-modal-heading">
+
+                        <span class="report-modal-icon">
+
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+
+                        </span>
+
+                        <div>
+
+                            <span>Colabora con EasySpot</span>
+
+                            <h2 id="reportModalTitle">
+                                Crear reporte comunitario
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                    <button type="button"
+                            class="report-modal-close"
+                            data-close-report-modal
+                            aria-label="Cerrar ventana">
+
+                        <i class="fa-solid fa-xmark"></i>
+
+                    </button>
+
+                </div>
+
+                <form th:action="@{/reportes/crear}"
+                      method="post"
+                      enctype="multipart/form-data"
+                      id="reportForm"
+                      class="report-form">
+
+                    <!-- Progreso -->
+                    <div class="report-form-progress">
+
+                        <div class="report-form-progress-header">
+
+                            <span>
+                                Completa la información del incidente
+                            </span>
+
+                            <strong id="reportFormProgressValue">
+                                0%
+                            </strong>
+
+                        </div>
+
+                        <div class="report-form-progress-track">
+
+                            <span id="reportFormProgressBar"></span>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Tipo -->
+                    <fieldset class="report-form-section">
+
+                        <legend>
+
+                            <span>1</span>
+
+                            ¿Qué está ocurriendo?
+
+                        </legend>
+
+                        <p>
+                            Selecciona la categoría que mejor representa
+                            el incidente.
+                        </p>
+
+                        <div class="report-type-selector">
+
+                            <label class="report-type-option">
+
+                                <input type="radio"
+                                       name="tipo"
+                                       value="ACCIDENTE"
+                                       required>
+
+                                <span class="report-type-option-content">
+
+                                    <span class="report-type-option-icon type-accident">
+
+                                        <i class="fa-solid fa-car-burst"></i>
+
+                                    </span>
+
+                                    <strong>Accidente</strong>
+
+                                    <small>
+                                        Colisión o riesgo vial.
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+                            <label class="report-type-option">
+
+                                <input type="radio"
+                                       name="tipo"
+                                       value="SEGURIDAD"
+                                       required>
+
+                                <span class="report-type-option-content">
+
+                                    <span class="report-type-option-icon type-security">
+
+                                        <i class="fa-solid fa-shield-halved"></i>
+
+                                    </span>
+
+                                    <strong>Seguridad</strong>
+
+                                    <small>
+                                        Situación de riesgo.
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+                            <label class="report-type-option">
+
+                                <input type="radio"
+                                       name="tipo"
+                                       value="PARQUEO_LLENO"
+                                       required>
+
+                                <span class="report-type-option-content">
+
+                                    <span class="report-type-option-icon type-full">
+
+                                        <i class="fa-solid fa-square-parking"></i>
+
+                                    </span>
+
+                                    <strong>Parqueo lleno</strong>
+
+                                    <small>
+                                        Sin espacios disponibles.
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+                            <label class="report-type-option">
+
+                                <input type="radio"
+                                       name="tipo"
+                                       value="ESPACIO_BLOQUEADO"
+                                       required>
+
+                                <span class="report-type-option-content">
+
+                                    <span class="report-type-option-icon type-blocked">
+
+                                        <i class="fa-solid fa-ban"></i>
+
+                                    </span>
+
+                                    <strong>Espacio bloqueado</strong>
+
+                                    <small>
+                                        Acceso o salida obstruida.
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+                            <label class="report-type-option">
+
+                                <input type="radio"
+                                       name="tipo"
+                                       value="OBRAS"
+                                       required>
+
+                                <span class="report-type-option-content">
+
+                                    <span class="report-type-option-icon type-construction">
+
+                                        <i class="fa-solid fa-person-digging"></i>
+
+                                    </span>
+
+                                    <strong>Obras</strong>
+
+                                    <small>
+                                        Construcción o mantenimiento.
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+                            <label class="report-type-option">
+
+                                <input type="radio"
+                                       name="tipo"
+                                       value="TRAFICO"
+                                       required>
+
+                                <span class="report-type-option-content">
+
+                                    <span class="report-type-option-icon type-traffic">
+
+                                        <i class="fa-solid fa-road"></i>
+
+                                    </span>
+
+                                    <strong>Tráfico</strong>
+
+                                    <small>
+                                        Congestión o acceso lento.
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+                            <label class="report-type-option">
+
+                                <input type="radio"
+                                       name="tipo"
+                                       value="OTRO"
+                                       required>
+
+                                <span class="report-type-option-content">
+
+                                    <span class="report-type-option-icon type-other">
+
+                                        <i class="fa-solid fa-ellipsis"></i>
+
+                                    </span>
+
+                                    <strong>Otro</strong>
+
+                                    <small>
+                                        Otra situación relevante.
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </fieldset>
+
+                    <!-- Prioridad automática -->
+                    <div class="report-auto-priority"
+                         id="reportAutoPriority">
+
+                        <span class="report-auto-priority-icon">
+
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+                        </span>
+
+                        <div>
+
+                            <small>Prioridad sugerida por EasyBot</small>
+
+                            <strong id="suggestedPriorityText">
+                                Selecciona una categoría
+                            </strong>
+
+                        </div>
+
+                        <span class="report-auto-priority-badge"
+                              id="suggestedPriorityBadge">
+
+                            Pendiente
+
+                        </span>
+
+                    </div>
+
+                    <!-- Información -->
+                    <fieldset class="report-form-section">
+
+                        <legend>
+
+                            <span>2</span>
+
+                            Describe el incidente
+
+                        </legend>
+
+                        <p>
+                            Incluye información breve y útil para
+                            otros conductores.
+                        </p>
+
+                        <div class="report-form-grid">
+
+                            <label class="report-field report-field-full">
+
+                                <span>
+                                    Título del reporte
+                                    <strong>*</strong>
+                                </span>
+
+                                <div class="report-field-control">
+
+                                    <i class="fa-solid fa-heading"></i>
+
+                                    <input type="text"
+                                           name="titulo"
+                                           id="reportTitle"
+                                           maxlength="100"
+                                           placeholder="Ejemplo: Salida principal bloqueada"
+                                           required>
+
+                                </div>
+
+                                <small class="report-field-counter">
+
+                                    <span id="reportTitleCounter">0</span>/100
+
+                                </small>
+
+                            </label>
+
+                            <label class="report-field report-field-full">
+
+                                <span>
+                                    Descripción
+                                    <strong>*</strong>
+                                </span>
+
+                                <div class="report-textarea-control">
+
+                                    <i class="fa-solid fa-align-left"></i>
+
+                                    <textarea name="descripcion"
+                                              id="reportDescription"
+                                              rows="5"
+                                              maxlength="500"
+                                              placeholder="Describe qué ocurre, desde cuándo y cómo afecta el acceso..."
+                                              required></textarea>
+
+                                </div>
+
+                                <small class="report-field-counter">
+
+                                    <span id="reportDescriptionCounter">0</span>/500
+
+                                </small>
+
+                            </label>
+
+                        </div>
+
+                    </fieldset>
+
+                    <!-- Ubicación -->
+                    <fieldset class="report-form-section">
+
+                        <legend>
+
+                            <span>3</span>
+
+                            Ubicación del reporte
+
+                        </legend>
+
+                        <p>
+                            Puedes vincular el reporte con un parqueo
+                            o utilizar tu ubicación actual.
+                        </p>
+
+                        <div class="report-form-grid">
+
+                            <label class="report-field">
+
+                                <span>Parqueo relacionado</span>
+
+                                <div class="report-select-control">
+
+                                    <i class="fa-solid fa-square-parking"></i>
+
+                                    <select name="idParqueo"
+                                            id="reportParking">
+
+                                        <option value="">
+                                            Seleccionar parqueo
+                                        </option>
+
+                                        <option th:each="parqueo : ${parqueos}"
+                                                th:value="${parqueo.idParqueo}"
+                                                th:text="${parqueo.nombre}">
+
+                                            Parqueo
+
+                                        </option>
+
+                                    </select>
+
+                                    <i class="fa-solid fa-chevron-down"></i>
+
+                                </div>
+
+                            </label>
+
+                            <label class="report-field">
+
+                                <span>
+                                    Ubicación o referencia
+                                    <strong>*</strong>
+                                </span>
+
+                                <div class="report-field-control">
+
+                                    <i class="fa-solid fa-location-dot"></i>
+
+                                    <input type="text"
+                                           name="ubicacion"
+                                           id="reportLocation"
+                                           maxlength="180"
+                                           placeholder="Ejemplo: Entrada norte, San Pedro"
+                                           required>
+
+                                </div>
+
+                            </label>
+
+                            <div class="report-location-actions report-field-full">
+
+                                <button type="button"
+                                        class="report-location-button"
+                                        id="useCurrentLocation">
+
+                                    <span>
+
+                                        <i class="fa-solid fa-location-crosshairs"></i>
+
+                                    </span>
+
+                                    <div>
+
+                                        <strong>Usar mi ubicación actual</strong>
+
+                                        <small>
+                                            EasySpot detectará tus coordenadas.
+                                        </small>
+
+                                    </div>
+
+                                </button>
+
+                                <div class="report-location-status"
+                                     id="reportLocationStatus"
+                                     hidden>
+
+                                    <i class="fa-solid fa-circle-check"></i>
+
+                                    <span>Ubicación obtenida correctamente</span>
+
+                                </div>
+
+                                <input type="hidden"
+                                       name="latitud"
+                                       id="reportLatitude">
+
+                                <input type="hidden"
+                                       name="longitud"
+                                       id="reportLongitude">
+
+                            </div>
+
+                        </div>
+
+                    </fieldset>
+
+                    <!-- Imagen -->
+                    <fieldset class="report-form-section">
+
+                        <legend>
+
+                            <span>4</span>
+
+                            Evidencia opcional
+
+                        </legend>
+
+                        <p>
+                            Agrega una fotografía para facilitar
+                            la validación del reporte.
+                        </p>
+
+                        <label class="report-upload"
+                               id="reportUploadArea">
+
+                            <input type="file"
+                                   name="imagen"
+                                   id="reportImage"
+                                   accept="image/png,image/jpeg,image/webp">
+
+                            <span class="report-upload-icon">
+
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                            </span>
+
+                            <strong>Selecciona o arrastra una imagen</strong>
+
+                            <small>
+                                PNG, JPG o WEBP · Máximo 5 MB
+                            </small>
+
+                            <span class="report-upload-button">
+                                Seleccionar archivo
+                            </span>
+
+                        </label>
+
+                        <div class="report-image-preview"
+                             id="reportImagePreview"
+                             hidden>
+
+                            <img id="reportImagePreviewElement"
+                                 src=""
+                                 alt="Vista previa de la evidencia">
+
+                            <div>
+
+                                <strong id="reportImageName">
+                                    evidencia.jpg
+                                </strong>
+
+                                <small id="reportImageSize">
+                                    0 KB
+                                </small>
+
+                            </div>
+
+                            <button type="button"
+                                    id="removeReportImage"
+                                    aria-label="Eliminar imagen">
+
+                                <i class="fa-solid fa-trash"></i>
+
+                            </button>
+
+                        </div>
+
+                    </fieldset>
+
+                    <!-- Recomendación -->
+                    <div class="report-community-notice">
+
+                        <i class="fa-solid fa-shield-heart"></i>
+
+                        <p>
+                            Al publicar confirmas que la información es
+                            verdadera y que no contiene datos personales
+                            sensibles.
+                        </p>
+
+                    </div>
+
+                    <!-- Acciones -->
+                    <div class="report-modal-actions">
+
+                        <button type="button"
+                                class="report-cancel-button"
+                                data-close-report-modal>
+
+                            Cancelar
+
+                        </button>
+
+                        <button type="submit"
+                                class="report-submit-button"
+                                id="submitReportButton">
+
+                            <span>
+
+                                <i class="fa-solid fa-paper-plane"></i>
+
+                                Publicar reporte
+
+                            </span>
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <!-- =========================================================
+             VISOR DE IMAGEN
+             ========================================================= -->
+        <div class="report-image-viewer"
+             id="reportImageViewer"
+             aria-hidden="true">
+
+            <div class="report-image-viewer-backdrop"
+                 data-close-image-viewer>
+            </div>
+
+            <div class="report-image-viewer-content">
+
+                <button type="button"
+                        class="report-image-viewer-close"
+                        data-close-image-viewer
+                        aria-label="Cerrar imagen">
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                </button>
+
+                <img id="reportImageViewerElement"
+                     src=""
+                     alt="Evidencia ampliada">
+
+            </div>
+
+        </div>
+
+        <!-- =========================================================
+             SCRIPTS GENERALES
+             ========================================================= -->
+        <div th:replace="~{layout/fragmentos :: scripts}">
+        </div>
+
+        <!-- Script específico -->
+        <script th:src="@{/js/reportes.js}"></script>
+
     </body>
+
 </html>

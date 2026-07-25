@@ -510,26 +510,24 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
         grid-template-columns:repeat(2,minmax(0,1fr))
     }
 }
+
 @media(max-width:760px){
-    .dashboard-shell{
-        display:block
-    }
-    .dashboard-sidebar{
-        position:relative;
-        width:100%;
-        height:auto
-    }
-    .reservations-header,.reservation-card-top{
+
+    .reservations-header,
+    .reservation-card-top{
         align-items:flex-start;
-        flex-direction:column
+        flex-direction:column;
     }
+
     .reservation-code{
-        text-align:left
+        text-align:left;
     }
+
     .reservation-side-column{
-        grid-template-columns:1fr
+        grid-template-columns:1fr;
     }
 }
+
 @media(max-width:560px){
     .reservations-main{
         padding:18px

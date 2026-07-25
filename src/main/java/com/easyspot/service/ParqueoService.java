@@ -21,4 +21,5 @@ public interface ParqueoService {
     int contarEspaciosDisponibles(List<ParqueoDashboardDTO> resultados);
     Parqueo obtenerPorId(Long idParqueo);
     Parqueo guardar(Parqueo parqueo);
+    List<Parqueo> obtenerParqueosActivos();
 }

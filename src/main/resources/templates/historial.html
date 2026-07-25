@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{layout/fragmentos :: head(
+          'Historial de reservas | EasySpot AI',
+          'historial'
+          )}">
+    </head>
+
+    <body>
+
+        <div class="dashboard-shell">
+
+            <!-- =====================================================
+                 SIDEBAR
+                 ===================================================== -->
+            <aside th:replace="~{layout/fragmentos :: sidebar('historial')}">
+            </aside>
+
+            <!-- =====================================================
+                 CONTENIDO PRINCIPAL
+                 ===================================================== -->
+            <main class="history-main">
+
+                <!-- Decoraciones de fondo -->
+                <div class="history-background"
+                     aria-hidden="true">
+
+                    <span class="history-orb history-orb-one"></span>
+                    <span class="history-orb history-orb-two"></span>
+                    <span class="history-grid"></span>
+
+                </div>
+
+                <div class="history-container">
+
+                    <!-- =================================================
+                         ENCABEZADO
+                         ================================================= -->
+                    <header class="history-header">
+
+                        <div class="history-header-content">
+
+                            <span class="history-eyebrow">
+
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+
+                                Actividad de estacionamiento
+
+                            </span>
+
+                            <h1>
+                                Historial de
+                                <span>reservas</span>
+                            </h1>
+
+                            <p>
+                                Consulta tus reservas anteriores, revisa sus
+                                detalles y vuelve a encontrar tus parqueos
+                                favoritos fácilmente.
+                            </p>
+
+                        </div>
+
+                        <a th:href="@{/dashboard}"
+                           class="history-header-action">
+
+                            <span class="history-header-action-icon">
+
+                                <i class="fa-solid fa-plus"></i>
+
+                            </span>
+
+                            <span>
+
+                                <small>Nueva búsqueda</small>
+
+                                <strong>Reservar parqueo</strong>
+
+                            </span>
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </a>
+
+                    </header>
+
+                    <!-- =================================================
+                         ALERTAS
+                         ================================================= -->
+                    <section class="history-alerts">
+
+                        <div class="history-alert history-alert-success"
+                             th:if="${param.creada}">
+
+                            <span class="history-alert-icon">
+
+                                <i class="fa-solid fa-circle-check"></i>
+
+                            </span>
+
+                            <div>
+
+                                <strong>Reserva creada correctamente</strong>
+
+                                <p>
+                                    Tu nueva reserva ya se encuentra
+                                    disponible en EasySpot.
+                                </p>
+
+                            </div>
+
+                            <button type="button"
+                                    class="history-alert-close"
+                                    aria-label="Cerrar mensaje">
+
+                                <i class="fa-solid fa-xmark"></i>
+
+                            </button>
+
+                        </div>
+
+                        <div class="history-alert history-alert-warning"
+                             th:if="${param.cancelada}">
+
+                            <span class="history-alert-icon">
+
+                                <i class="fa-solid fa-circle-info"></i>
+
+                            </span>
+
+                            <div>
+
+                                <strong>Reserva cancelada</strong>
+
+                                <p>
+                                    La reserva fue cancelada y el espacio
+                                    volvió a estar disponible.
+                                </p>
+
+                            </div>
+
+                            <button type="button"
+                                    class="history-alert-close"
+                                    aria-label="Cerrar mensaje">
+
+                                <i class="fa-solid fa-xmark"></i>
+
+                            </button>
+
+                        </div>
+
+                    </section>
+
+                    <!-- =================================================
+                         ESTADÍSTICAS
+                         ================================================= -->
+                    <section class="history-stats"
+                             aria-label="Resumen del historial">
+
+                        <!-- Total -->
+                        <article class="history-stat-card"
+                                 data-animation="fade-up">
+
+                            <div class="history-stat-top">
+
+                                <span class="history-stat-icon stat-icon-blue">
+
+                                    <i class="fa-solid fa-calendar-check"></i>
+
+                                </span>
+
+                                <span class="history-stat-trend">
+
+                                    <i class="fa-solid fa-chart-line"></i>
+
+                                    Actividad
+
+                                </span>
+
+                            </div>
+
+                            <div class="history-stat-value"
+                                 th:text="${totalReservas != null
+                                 ? totalReservas
+                                 : 0}">
+
+                                0
+
+                            </div>
+
+                            <h2>Reservas realizadas</h2>
+
+                            <p>
+                                Total acumulado desde que utilizas EasySpot.
+                            </p>
+
+                            <div class="history-stat-decoration"></div>
+
+                        </article>
+
+                        <!-- Completadas -->
+                        <article class="history-stat-card"
+                                 data-animation="fade-up">
+
+                            <div class="history-stat-top">
+
+                                <span class="history-stat-icon stat-icon-green">
+
+                                    <i class="fa-solid fa-circle-check"></i>
+
+                                </span>
+
+                                <span class="history-stat-trend stat-trend-green">
+
+                                    <i class="fa-solid fa-check"></i>
+
+                                    Finalizadas
+
+                                </span>
+
+                            </div>
+
+                            <div class="history-stat-value"
+                                 th:text="${historial != null
+                                 ? #lists.size(
+                                 historial.?[
+                                 estado != null
+                                 and estado.name() == 'COMPLETADA'
+                                 ]
+                                 )
+                                 : 0}">
+
+                                0
+
+                            </div>
+
+                            <h2>Completadas</h2>
+
+                            <p>
+                                Reservas utilizadas y finalizadas con éxito.
+                            </p>
+
+                            <div class="history-stat-decoration"></div>
+
+                        </article>
+
+                        <!-- Canceladas -->
+                        <article class="history-stat-card"
+                                 data-animation="fade-up">
+
+                            <div class="history-stat-top">
+
+                                <span class="history-stat-icon stat-icon-red">
+
+                                    <i class="fa-solid fa-ban"></i>
+
+                                </span>
+
+                                <span class="history-stat-trend stat-trend-red">
+
+                                    <i class="fa-solid fa-arrow-trend-down"></i>
+
+                                    Canceladas
+
+                                </span>
+
+                            </div>
+
+                            <div class="history-stat-value"
+                                 th:text="${reservasCanceladas != null
+                                 ? reservasCanceladas
+                                 : 0}">
+
+                                0
+
+                            </div>
+
+                            <h2>Cancelaciones</h2>
+
+                            <p>
+                                Reservas que fueron canceladas previamente.
+                            </p>
+
+                            <div class="history-stat-decoration"></div>
+
+                        </article>
+
+                        <!-- Tiempo promedio -->
+                        <article class="history-stat-card"
+                                 data-animation="fade-up">
+
+                            <div class="history-stat-top">
+
+                                <span class="history-stat-icon stat-icon-purple">
+
+                                    <i class="fa-regular fa-clock"></i>
+
+                                </span>
+
+                                <span class="history-stat-trend stat-trend-purple">
+
+                                    <i class="fa-solid fa-stopwatch"></i>
+
+                                    Promedio
+
+                                </span>
+
+                            </div>
+
+                            <div class="history-stat-value history-stat-time"
+                                 th:text="${tiempoPromedio != null
+                                 ? tiempoPromedio
+                                 : '--'}">
+
+                                --
+
+                            </div>
+
+                            <h2>Tiempo estacionado</h2>
+
+                            <p>
+                                Duración promedio de tus reservas completadas.
+                            </p>
+
+                            <div class="history-stat-decoration"></div>
+
+                        </article>
+
+                    </section>
+
+                    <!-- =================================================
+                         PANEL DE FILTROS
+                         ================================================= -->
+                    <section class="history-toolbar">
+
+                        <div class="history-search">
+
+                            <i class="fa-solid fa-magnifying-glass"></i>
+
+                            <input type="search"
+                                   id="historySearch"
+                                   placeholder="Buscar por parqueo, código o ubicación..."
+                                   autocomplete="off"
+                                   aria-label="Buscar en el historial">
+
+                            <button type="button"
+                                    id="clearHistorySearch"
+                                    class="history-search-clear"
+                                    aria-label="Limpiar búsqueda"
+                                    hidden>
+
+                                <i class="fa-solid fa-xmark"></i>
+
+                            </button>
+
+                        </div>
+
+                        <div class="history-filters"
+                             role="group"
+                             aria-label="Filtrar reservas">
+
+                            <button type="button"
+                                    class="history-filter active"
+                                    data-filter="TODAS">
+
+                                <i class="fa-solid fa-layer-group"></i>
+
+                                Todas
+
+                                <span th:text="${historial != null
+                                      ? #lists.size(historial)
+                                      : 0}">
+
+                                    0
+
+                                </span>
+
+                            </button>
+
+                            <button type="button"
+                                    class="history-filter"
+                                    data-filter="COMPLETADA">
+
+                                <i class="fa-solid fa-circle-check"></i>
+
+                                Completadas
+
+                                <span th:text="${historial != null
+                                      ? #lists.size(
+                                      historial.?[
+                                      estado != null
+                                      and estado.name() == 'COMPLETADA'
+                                      ]
+                                      )
+                                      : 0}">
+
+                                    0
+
+                                </span>
+
+                            </button>
+
+                            <button type="button"
+                                    class="history-filter"
+                                    data-filter="CANCELADA">
+
+                                <i class="fa-solid fa-circle-xmark"></i>
+
+                                Canceladas
+
+                                <span th:text="${reservasCanceladas != null
+                                      ? reservasCanceladas
+                                      : 0}">
+
+                                    0
+
+                                </span>
+
+                            </button>
+
+                        </div>
+
+                        <div class="history-view-control">
+
+                            <span>Vista</span>
+
+                            <button type="button"
+                                    class="history-view-button active"
+                                    data-view="grid"
+                                    aria-label="Vista de tarjetas">
+
+                                <i class="fa-solid fa-table-cells-large"></i>
+
+                            </button>
+
+                            <button type="button"
+                                    class="history-view-button"
+                                    data-view="list"
+                                    aria-label="Vista de lista">
+
+                                <i class="fa-solid fa-list"></i>
+
+                            </button>
+
+                        </div>
+
+                    </section>
+
+                    <!-- =================================================
+                         RESULTADOS
+                         ================================================= -->
+                    <section class="history-results-section">
+
+                        <div class="history-results-header">
+
+                            <div>
+
+                                <span class="history-section-kicker">
+                                    Movimientos recientes
+                                </span>
+
+                                <h2>Tus reservas anteriores</h2>
+
+                            </div>
+
+                            <div class="history-results-counter">
+
+                                <span id="visibleHistoryCount"
+                                      th:text="${historial != null
+                                      ? #lists.size(historial)
+                                      : 0}">
+
+                                    0
+
+                                </span>
+
+                                <span>resultados</span>
+
+                            </div>
+
+                        </div>
+
+                        <!-- =============================================
+                             LISTADO CON DATOS
+                             ============================================= -->
+                        <div id="historyResults"
+                             class="history-grid-results"
+                             th:if="${historial != null
+                             and !#lists.isEmpty(historial)}">
+
+                            <article class="history-card"
+                                     th:each="reserva, estadoIteracion : ${historial}"
+                                     th:data-status="${reserva.estado != null
+                                     ? reserva.estado.name()
+                                     : ''}"
+                                     th:data-parking-name="${reserva.parqueo != null
+                                     ? reserva.parqueo.nombre
+                                     : 'Parqueo'}"
+                                     th:data-reservation-code="${reserva.codigoReserva}"
+                                     th:data-address="${reserva.parqueo != null
+                                     ? reserva.parqueo.direccion
+                                     : ''}"
+                                     th:data-index="${estadoIteracion.index}"
+                                     data-animation="history-card">
+
+                                <!-- Imagen -->
+                                <div class="history-card-media">
+
+                                    <img th:if="${reserva.parqueo != null
+                                         and reserva.parqueo.imagenUrl != null
+                                         and !#strings.isEmpty(
+                                         reserva.parqueo.imagenUrl
+                                         )}"
+                                         th:src="${reserva.parqueo.imagenUrl}"
+                                         th:alt="${'Imagen de '
+                                         + reserva.parqueo.nombre}"
+                                         loading="lazy">
+
+                                    <div class="history-card-placeholder"
+                                         th:unless="${reserva.parqueo != null
+                                         and reserva.parqueo.imagenUrl != null
+                                         and !#strings.isEmpty(
+                                         reserva.parqueo.imagenUrl
+                                         )}">
+
+                                        <div>
+
+                                            <i class="fa-solid fa-square-parking"></i>
+
+                                            <span>EasySpot Parking</span>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="history-card-overlay"></div>
+
+                                    <!-- Estado -->
+                                    <span class="history-status-badge completed"
+                                          th:if="${reserva.estado != null
+                                          and reserva.estado.name()
+                                          == 'COMPLETADA'}">
+
+                                        <i class="fa-solid fa-circle-check"></i>
+
+                                        Completada
+
+                                    </span>
+
+                                    <span class="history-status-badge cancelled"
+                                          th:if="${reserva.estado != null
+                                          and reserva.estado.name()
+                                          == 'CANCELADA'}">
+
+                                        <i class="fa-solid fa-circle-xmark"></i>
+
+                                        Cancelada
+
+                                    </span>
+
+                                    <span class="history-status-badge active"
+                                          th:if="${reserva.estado != null
+                                          and reserva.estado.name()
+                                          == 'ACTIVA'}">
+
+                                        <i class="fa-solid fa-circle-dot"></i>
+
+                                        Activa
+
+                                    </span>
+
+                                    <!-- Precio -->
+                                    <div class="history-card-price">
+
+                                        <small>Total pagado</small>
+
+                                        <strong th:text="${reserva.precioTotal != null
+                                                ? '₡'
+                                                + #numbers.formatDecimal(
+                                                reserva.precioTotal,
+                                                0,
+                                                'POINT',
+                                                0,
+                                                'COMMA'
+                                                )
+                                                : '₡0'}">
+
+                                            ₡0
+
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Contenido -->
+                                <div class="history-card-content">
+
+                                    <div class="history-card-heading">
+
+                                        <div class="history-parking-icon">
+
+                                            <i class="fa-solid fa-location-dot"></i>
+
+                                        </div>
+
+                                        <div>
+
+                                            <h3 th:text="${reserva.parqueo != null
+                                                ? reserva.parqueo.nombre
+                                                : 'Parqueo no disponible'}">
+
+                                                Nombre del parqueo
+
+                                            </h3>
+
+                                            <p>
+
+                                                <i class="fa-solid fa-map-pin"></i>
+
+                                                <span th:text="${reserva.parqueo != null
+                                                      and reserva.parqueo.direccion != null
+                                                      ? reserva.parqueo.direccion
+                                                      : 'Dirección no disponible'}">
+
+                                                    Dirección
+
+                                                </span>
+
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Código -->
+                                    <div class="history-code-row">
+
+                                        <span>
+
+                                            <i class="fa-solid fa-ticket"></i>
+
+                                            Código de reserva
+
+                                        </span>
+
+                                        <button type="button"
+                                                class="history-code-copy"
+                                                th:data-code="${reserva.codigoReserva}"
+                                                title="Copiar código">
+
+                                            <strong th:text="${reserva.codigoReserva}">
+                                                ESP-000000
+                                            </strong>
+
+                                            <i class="fa-regular fa-copy"></i>
+
+                                        </button>
+
+                                    </div>
+
+                                    <!-- Información principal -->
+                                    <div class="history-card-details">
+
+                                        <div class="history-detail">
+
+                                            <span class="history-detail-icon">
+
+                                                <i class="fa-regular fa-calendar"></i>
+
+                                            </span>
+
+                                            <div>
+
+                                                <small>Fecha</small>
+
+                                                <strong th:text="${reserva.fecha != null
+                                                        ? #temporals.format(
+                                                        reserva.fecha,
+                                                        'dd/MM/yyyy'
+                                                        )
+                                                        : '--/--/----'}">
+
+                                                    20/07/2026
+
+                                                </strong>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="history-detail">
+
+                                            <span class="history-detail-icon">
+
+                                                <i class="fa-regular fa-clock"></i>
+
+                                            </span>
+
+                                            <div>
+
+                                                <small>Horario</small>
+
+                                                <strong>
+
+                                                    <span th:text="${reserva.horaInicio != null
+                                                          ? #temporals.format(
+                                                          reserva.horaInicio,
+                                                          'HH:mm'
+                                                          )
+                                                          : '--:--'}">
+
+                                                        08:00
+
+                                                    </span>
+
+                                                    <i class="fa-solid fa-arrow-right"></i>
+
+                                                    <span th:text="${reserva.horaSalida != null
+                                                          ? #temporals.format(
+                                                          reserva.horaSalida,
+                                                          'HH:mm'
+                                                          )
+                                                          : '--:--'}">
+
+                                                        10:00
+
+                                                    </span>
+
+                                                </strong>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="history-detail">
+
+                                            <span class="history-detail-icon">
+
+                                                <i class="fa-solid fa-car-side"></i>
+
+                                            </span>
+
+                                            <div>
+
+                                                <small>Espacio asignado</small>
+
+                                                <strong th:text="${reserva.espacioAsignado != null
+                                                        and !#strings.isEmpty(
+                                                        reserva.espacioAsignado
+                                                        )
+                                                        ? reserva.espacioAsignado
+                                                        : 'Sin asignar'}">
+
+                                                    E-12
+
+                                                </strong>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="history-detail">
+
+                                            <span class="history-detail-icon">
+
+                                                <i class="fa-solid fa-coins"></i>
+
+                                            </span>
+
+                                            <div>
+
+                                                <small>Tarifa por hora</small>
+
+                                                <strong th:text="${reserva.parqueo != null
+                                                        and reserva.parqueo.tarifaHora != null
+                                                        ? '₡'
+                                                        + #numbers.formatDecimal(
+                                                        reserva.parqueo.tarifaHora,
+                                                        0,
+                                                        'POINT',
+                                                        0,
+                                                        'COMMA'
+                                                        )
+                                                        : 'No disponible'}">
+
+                                                    ₡1 000
+
+                                                </strong>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Timeline -->
+                                    <div class="history-timeline"
+                                         th:classappend="${reserva.estado != null
+                                         and reserva.estado.name()
+                                         == 'CANCELADA'}
+                                         ? ' timeline-cancelled'
+                                         : ' timeline-completed'">
+
+                                        <div class="history-timeline-step done">
+
+                                            <span>
+
+                                                <i class="fa-solid fa-check"></i>
+
+                                            </span>
+
+                                            <small>Creada</small>
+
+                                        </div>
+
+                                        <div class="history-timeline-line"></div>
+
+                                        <div class="history-timeline-step done">
+
+                                            <span>
+
+                                                <i class="fa-solid fa-car"></i>
+
+                                            </span>
+
+                                            <small>Reservada</small>
+
+                                        </div>
+
+                                        <div class="history-timeline-line"></div>
+
+                                        <div class="history-timeline-step completed"
+                                             th:if="${reserva.estado != null
+                                             and reserva.estado.name()
+                                             == 'COMPLETADA'}">
+
+                                            <span>
+
+                                                <i class="fa-solid fa-flag-checkered"></i>
+
+                                            </span>
+
+                                            <small>Finalizada</small>
+
+                                        </div>
+
+                                        <div class="history-timeline-step cancelled"
+                                             th:if="${reserva.estado != null
+                                             and reserva.estado.name()
+                                             == 'CANCELADA'}">
+
+                                            <span>
+
+                                                <i class="fa-solid fa-xmark"></i>
+
+                                            </span>
+
+                                            <small>Cancelada</small>
+
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Acciones -->
+                                    <div class="history-card-actions">
+
+                                        <a th:if="${reserva.parqueo != null}"
+                                           th:href="@{/dashboard(
+                                           idParqueo=${reserva.parqueo.idParqueo},
+                                           repetir=true
+                                           )}"
+                                           class="history-action-primary">
+
+                                            <i class="fa-solid fa-rotate-right"></i>
+
+                                            Reservar nuevamente
+
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                        </div>
+
+                        <!-- =============================================
+                             ESTADO VACÍO INICIAL
+                             ============================================= -->
+                        <div class="history-empty"
+                             th:if="${historial == null
+                             or #lists.isEmpty(historial)}">
+
+                            <div class="history-empty-visual">
+
+                                <span class="history-empty-ring ring-one"></span>
+                                <span class="history-empty-ring ring-two"></span>
+
+                                <div class="history-empty-icon">
+
+                                    <i class="fa-solid fa-clock-rotate-left"></i>
+
+                                </div>
+
+                                <span class="history-empty-floating floating-car">
+
+                                    <i class="fa-solid fa-car-side"></i>
+
+                                </span>
+
+                                <span class="history-empty-floating floating-pin">
+
+                                    <i class="fa-solid fa-location-dot"></i>
+
+                                </span>
+
+                            </div>
+
+                            <span class="history-empty-eyebrow">
+                                Tu historial está esperando
+                            </span>
+
+                            <h2>Aún no tienes reservas anteriores</h2>
+
+                            <p>
+                                Cuando completes o canceles una reserva,
+                                aparecerá aquí con todos sus detalles.
+                            </p>
+
+                            <a th:href="@{/dashboard}"
+                               class="history-empty-button">
+
+                                <i class="fa-solid fa-magnifying-glass-location"></i>
+
+                                Buscar parqueos
+
+                                <i class="fa-solid fa-arrow-right"></i>
+
+                            </a>
+
+                        </div>
+
+                        <!-- =============================================
+                             ESTADO SIN RESULTADOS DEL BUSCADOR
+                             Se muestra mediante JavaScript.
+                             ============================================= -->
+                        <div id="historyNoResults"
+                             class="history-empty history-empty-search"
+                             hidden>
+
+                            <div class="history-empty-visual compact">
+
+                                <div class="history-empty-icon">
+
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                                </div>
+
+                            </div>
+
+                            <span class="history-empty-eyebrow">
+                                Sin coincidencias
+                            </span>
+
+                            <h2>No encontramos reservas</h2>
+
+                            <p>
+                                Prueba con otro nombre de parqueo,
+                                código de reserva o filtro.
+                            </p>
+
+                            <button type="button"
+                                    id="resetHistoryFilters"
+                                    class="history-empty-button">
+
+                                <i class="fa-solid fa-rotate-left"></i>
+
+                                Restablecer búsqueda
+
+                            </button>
+
+                        </div>
+
+                    </section>
+
+                    <!-- =================================================
+                         CONSEJO EASYBOT
+                         ================================================= -->
+                    <section class="history-insight"
+                             th:if="${historial != null
+                             and !#lists.isEmpty(historial)}">
+
+                        <div class="history-insight-icon">
+
+                            <span class="history-insight-pulse"></span>
+
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+                        </div>
+
+                        <div class="history-insight-content">
+
+                            <span>EasyBot Insight</span>
+
+                            <h2>
+                                Tu historial puede ayudarte a reservar más rápido
+                            </h2>
+
+                            <p>
+                                Utiliza el botón
+                                <strong>“Reservar nuevamente”</strong>
+                                para volver a encontrar un parqueo que ya
+                                utilizaste anteriormente.
+                            </p>
+
+                        </div>
+
+                        <a th:href="@{/dashboard}"
+                           class="history-insight-action">
+
+                            Explorar parqueos
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </a>
+
+                    </section>
+
+                </div>
+
+            </main>
+
+        </div>
+
+        <!-- =========================================================
+             SCRIPTS GENERALES
+             ========================================================= -->
+        <div th:replace="~{layout/fragmentos :: scripts}">
+        </div>
+
+        <!-- Script específico del módulo -->
+        <script th:src="@{/js/historial.js}"></script>
+
+    </body>
+
+</html>

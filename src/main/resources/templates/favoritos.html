@@ -263,19 +263,6 @@
                                 <!-- ACCIONES -->
                                 <div class="favorite-card-actions">
 
-                                    <a th:href="@{/reservas/nueva(
-                                       idParqueo=${favorito.parqueo.idParqueo}
-                                       )}"
-                                       class="reserve-button"
-                                       th:classappend="${favorito.parqueo.espaciosDisponibles <= 0}
-                                       ? ' disabled'
-                                       : ''">
-
-                                        <i class="fa-regular fa-calendar-check"></i>
-                                        Reservar
-
-                                    </a>
-
                                     <a th:href="@{/dashboard(
                                        idParqueo=${favorito.parqueo.idParqueo}
                                        )}"

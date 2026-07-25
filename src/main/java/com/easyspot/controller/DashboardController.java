@@ -66,19 +66,32 @@ public class DashboardController {
             return "redirect:/login";
         }
 
+        // ===== AQUÍ VA =====
+        if (fecha == null) {
+            fecha = LocalDate.now();
+        }
+
+        if (horaInicio == null) {
+            horaInicio = LocalTime.of(8, 0);
+        }
+
+        if (horaSalida == null) {
+            horaSalida = LocalTime.of(9, 0);
+        }
+
         /*
-     * Se consultan los parqueos aplicando los filtros recibidos.
+         * Se consultan los parqueos aplicando los filtros recibidos.
          */
         List<ParqueoDashboardDTO> resultados
                 = parqueoService.buscarParaDashboard(
-                        q,
+                        null,
                         precioMaximo,
                         espaciosMinimos,
                         techado
                 );
 
         /*
-     * Se obtienen los parqueos favoritos del usuario.
+         * Se obtienen los parqueos favoritos del usuario.
          */
         List<Favorito> favoritos
                 = favoritoService.obtenerFavoritos(
@@ -91,7 +104,7 @@ public class DashboardController {
                 .collect(Collectors.toSet());
 
         /*
-     * Se envían los parqueos y favoritos al dashboard.
+         * Se envían los parqueos y favoritos al dashboard.
          */
         model.addAttribute("parqueos", resultados);
         model.addAttribute("favoritosIds", favoritosIds);
@@ -116,6 +129,17 @@ public class DashboardController {
                 googleMapsApiKey
         );
 
+        // Mantener los filtros seleccionados
+        model.addAttribute("q", q);
+        model.addAttribute("precioMaximo", precioMaximo);
+        model.addAttribute("espaciosMinimos", espaciosMinimos);
+        model.addAttribute("techado", techado);
+
+        // Mantener fecha y horas seleccionadas
+        model.addAttribute("fechaSeleccionada", fecha);
+        model.addAttribute("horaInicioSeleccionada", horaInicio);
+        model.addAttribute("horaSalidaSeleccionada", horaSalida);
+
         // Mantén aquí el resto de tus atributos actuales.
         return "dashboard";
     }
@@ -127,22 +151,6 @@ public class DashboardController {
     @GetMapping("/")
     public String landing() {
         return "index";
-    }
-
-    @GetMapping("/reportes")
-    public String reportes(HttpSession session) {
-        if (noLogueado(session)) {
-            return "redirect:/login";
-        }
-        return "reportes";
-    }
-
-    @GetMapping("/perfil")
-    public String perfil(HttpSession session) {
-        if (noLogueado(session)) {
-            return "redirect:/login";
-        }
-        return "perfil";
     }
 
     @GetMapping("/login")

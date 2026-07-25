@@ -11,6 +11,15 @@ let activeInfoWindow = null;
 let userMarker = null;
 let userLocation = null;
 
+let searchLocation = null;
+let currentSearchRadius = 5;
+let searchLocationMarker = null;
+
+let GeocoderClass = null;
+let AutocompleteClass = null;
+let placesAutocomplete = null;
+let placeSelectedFromAutocomplete = false;
+
 let AdvancedMarkerElementClass = null;
 let PinElementClass = null;
 let RouteClass = null;
@@ -22,6 +31,24 @@ let activeRouteParkingId = null;
 const markerRegistry = new Map();
 const infoWindowRegistry = new Map();
 const parkingDataRegistry = new Map();
+
+/*
+ * Pesos del algoritmo de recomendación.
+ * La suma debe ser igual a 1.
+ */
+const SMART_SCORE_WEIGHTS = Object.freeze({
+    proximity: 0.40,
+    availability: 0.30,
+    rating: 0.20,
+    price: 0.10
+});
+
+/*
+ * Distancia de referencia para reducir progresivamente
+ * la puntuación por cercanía. A 5 km el puntaje de
+ * proximidad baja aproximadamente a 37 puntos.
+ */
+const PROXIMITY_DECAY_KM = 5;
 
 /**
  * Inicializa Google Maps y crea los marcadores
@@ -39,6 +66,8 @@ async function initMap() {
     try {
 
         const {Map} = await google.maps.importLibrary("maps");
+        const {Geocoder} = await google.maps.importLibrary("geocoding");
+        const {Autocomplete} = await google.maps.importLibrary("places");
 
         const {
             AdvancedMarkerElement,
@@ -50,6 +79,8 @@ async function initMap() {
         AdvancedMarkerElementClass = AdvancedMarkerElement;
         PinElementClass = PinElement;
         RouteClass = Route;
+        GeocoderClass = Geocoder;
+        AutocompleteClass = Autocomplete;
 
         const centroSanJose = {
             lat: 9.932542,
@@ -65,6 +96,8 @@ async function initMap() {
             fullscreenControl: true,
             zoomControl: true
         });
+
+        initializePlacesAutocomplete();
 
         const bounds = new google.maps.LatLngBounds();
 
@@ -93,19 +126,7 @@ async function initMap() {
                 lng: parking.longitud
             };
 
-            const pin = new PinElement({
-                background: parking.mejor
-                        ? "#22c55e"
-                        : "#0ea5e9",
-
-                borderColor: parking.mejor
-                        ? "#15803d"
-                        : "#0284c7",
-
-                glyphColor: "#ffffff",
-                glyph: parking.mejor ? "★" : "P",
-                scale: parking.mejor ? 1.25 : 1
-            });
+            const pin = createParkingPin(parking);
 
             const marker = new AdvancedMarkerElement({
                 map: map,
@@ -149,7 +170,44 @@ async function initMap() {
 
         connectMyLocationButton();
 
-        locateUser(true);
+        connectRadiusSelector();
+
+        connectExpandRadiusButton();
+
+        /*
+         * Se revisa si el usuario escribió una ubicación
+         * en el buscador antes de cargar el Dashboard.
+         */
+        const locationInput = document.getElementById(
+                "locationSearchInput"
+                );
+
+        const hasSearchLocation =
+                Boolean(locationInput?.value.trim());
+
+        if (hasSearchLocation) {
+
+            /*
+             * Convierte el texto en coordenadas,
+             * centra el mapa y recalcula las distancias.
+             */
+            await applyGeographicSearch();
+
+            /*
+             * También obtenemos el GPS para poder calcular
+             * rutas reales desde la posición del usuario,
+             * pero no centramos el mapa en esa ubicación.
+             */
+            locateUser(false);
+
+        } else {
+
+            /*
+             * Si el campo está vacío, se usa el GPS
+             * como origen principal de búsqueda.
+             */
+            locateUser(true);
+        }
 
         openParkingFromUrl();
 
@@ -188,11 +246,23 @@ function readParkingData(item) {
         direccion: item.dataset.direccion || "Dirección no disponible",
         latitud: Number(item.dataset.latitud),
         longitud: Number(item.dataset.longitud),
-        precio: Number(item.dataset.precio),
-        espacios: Number(item.dataset.espacios),
-        calificacion: Number(item.dataset.calificacion),
+        precio: toFiniteNumber(item.dataset.precio, 0),
+        espacios: Math.max(
+                0,
+                toFiniteNumber(item.dataset.espacios, 0)
+                ),
+        espaciosTotales: Math.max(
+                0,
+                toFiniteNumber(item.dataset.espaciosTotales, 0)
+                ),
+        calificacion: Math.max(
+                0,
+                toFiniteNumber(item.dataset.calificacion, 0)
+                ),
         mejor: item.dataset.mejor === "true",
-        distanceMeters: null
+        distanceMeters: null,
+        smartScore: null,
+        scoreBreakdown: null
     };
 }
 
@@ -591,7 +661,7 @@ function connectMyLocationButton() {
 
             updateParkingDistances();
 
-            sortParkingCardsByDistance();
+            calculateAndApplySmartRecommendation();
 
             showLocationAccuracy();
 
@@ -648,7 +718,7 @@ function locateUser(centerMap = true) {
 
         updateParkingDistances();
 
-        sortParkingCardsByDistance();
+        calculateAndApplySmartRecommendation();
 
         showLocationAccuracy();
 
@@ -657,7 +727,7 @@ function locateUser(centerMap = true) {
                 "Mi ubicación"
                 );
 
-        if (centerMap) {
+        if (centerMap && !searchLocation) {
             centerMapOnUser();
         }
 
@@ -929,12 +999,13 @@ function degreesToRadians(degrees) {
  */
 function updateParkingDistances() {
 
-    if (!userLocation) {
+    const origin = searchLocation || userLocation;
+
+    if (!origin) {
         return;
     }
 
-    parkingDataRegistry.forEach(
-            (parking, parkingId) => {
+    parkingDataRegistry.forEach((parking, parkingId) => {
 
         if (!hasValidCoordinates(parking)) {
             return;
@@ -942,14 +1013,13 @@ function updateParkingDistances() {
 
         const distanceMeters =
                 calculateDistanceMeters(
-                        userLocation.lat,
-                        userLocation.lng,
+                        origin.lat,
+                        origin.lng,
                         parking.latitud,
                         parking.longitud
                         );
 
-        parking.distanceMeters =
-                distanceMeters;
+        parking.distanceMeters = distanceMeters;
 
         updateParkingCardDistance(
                 parkingId,
@@ -960,8 +1030,246 @@ function updateParkingDistances() {
                 parkingId,
                 parking
                 );
-    }
+    });
+
+    applyRadiusFilter();
+}
+
+function applyRadiusFilter() {
+
+    parkingDataRegistry.forEach((parking, parkingId) => {
+
+        const marker =
+                markerRegistry.get(
+                        String(parkingId)
+                        );
+
+        const card =
+                document.querySelector(
+                        `.parking-card[data-parking-id="${CSS.escape(String(parkingId))}"]`
+                        );
+
+        if (!marker || !card) {
+            return;
+        }
+
+        const insideRadius =
+                parking.distanceMeters <= currentSearchRadius * 1000;
+
+        marker.map =
+                insideRadius ? map : null;
+
+        card.style.display =
+                insideRadius ? "" : "none";
+
+    });
+
+    updateVisibleResults();
+
+    calculateAndApplySmartRecommendation();
+
+}
+
+/**
+ * Actualiza el contador, los espacios disponibles
+ * y el mensaje cuando el radio no tiene resultados.
+ */
+function updateVisibleResults() {
+
+    const cards = Array.from(
+            document.querySelectorAll(".parking-card")
+            );
+
+    const visibleCards = cards.filter(
+            (card) => card.style.display !== "none"
     );
+
+    const parkingCounter = document.getElementById(
+            "visibleParkingCount"
+            );
+
+    const spacesCounter = document.getElementById(
+            "visibleAvailableSpaces"
+            );
+
+    const resultsList = document.querySelector(
+            ".results-list"
+            );
+
+    const emptyResults = document.getElementById(
+            "dynamicEmptyResults"
+            );
+
+    const emptyMessage = document.getElementById(
+            "dynamicEmptyMessage"
+            );
+
+    const expandButton = document.getElementById(
+            "btnExpandSearchRadius"
+            );
+
+    /*
+     * Actualiza la cantidad de parqueos visibles.
+     */
+    if (parkingCounter) {
+
+        parkingCounter.textContent =
+                visibleCards.length === 1
+                ? "1 parqueo"
+                : `${visibleCards.length} parqueos`;
+    }
+
+    /*
+     * Suma los espacios disponibles.
+     */
+    const totalVisibleSpaces = visibleCards.reduce(
+            (total, card) => {
+
+        const parkingId = getParkingIdFromCard(card);
+
+        const parking = parkingDataRegistry.get(
+                String(parkingId)
+                );
+
+        return total + (parking?.espacios || 0);
+
+    }, 0);
+
+    if (spacesCounter) {
+        spacesCounter.textContent = totalVisibleSpaces;
+    }
+
+    /*
+     * ¿Hay resultados visibles?
+     */
+    const hasVisibleResults =
+            visibleCards.length > 0;
+
+    if (resultsList) {
+        resultsList.hidden = !hasVisibleResults;
+    }
+
+    if (emptyResults) {
+        emptyResults.hidden = hasVisibleResults;
+    }
+
+    /*
+     * Mostrar mensaje dinámico cuando no hay resultados.
+     */
+    if (!hasVisibleResults && emptyMessage) {
+
+        const locationName =
+                getCurrentSearchLocationName();
+
+        emptyMessage.textContent =
+                `No encontramos parqueos dentro de `
+                + `${currentSearchRadius} km de ${locationName}. `
+                + `Puedes ampliar el radio o buscar otra ubicación.`;
+
+        if (expandButton) {
+
+            if (currentSearchRadius >= 20) {
+
+                expandButton.style.display = "none";
+
+            } else {
+
+                expandButton.style.display = "";
+
+                let nextRadius;
+
+                switch (currentSearchRadius) {
+
+                    case 2:
+                        nextRadius = 5;
+                        break;
+
+                    case 5:
+                        nextRadius = 10;
+                        break;
+
+                    case 10:
+                        nextRadius = 20;
+                        break;
+
+                    default:
+                        nextRadius = null;
+                }
+
+                if (nextRadius) {
+
+                    expandButton.innerHTML = `
+                        <i class="fa-solid fa-expand"></i>
+                        Ampliar búsqueda a ${nextRadius} km
+                    `;
+                }
+            }
+        }
+
+    } else {
+
+        /*
+         * Si vuelven a aparecer resultados,
+         * aseguramos que el botón esté visible.
+         */
+        if (expandButton) {
+            expandButton.style.display = "";
+        }
+
+    }
+
+}
+
+/**
+ * Permite ampliar rápidamente la búsqueda
+ * desde el estado sin resultados.
+ */
+function connectExpandRadiusButton() {
+
+    const button = document.getElementById(
+            "btnExpandSearchRadius"
+            );
+
+    if (!button) {
+        return;
+    }
+
+    button.addEventListener("click", () => {
+
+        let nextRadius = null;
+
+        switch (currentSearchRadius) {
+
+            case 2:
+                nextRadius = 5;
+                break;
+
+            case 5:
+                nextRadius = 10;
+                break;
+
+            case 10:
+                nextRadius = 20;
+                break;
+
+            default:
+                return;
+        }
+
+        const nextRadio = document.querySelector(
+                `input[name="searchRadius"][value="${nextRadius}"]`
+                );
+
+        if (!nextRadio) {
+            return;
+        }
+
+        nextRadio.checked = true;
+        currentSearchRadius = nextRadius;
+
+        applyRadiusFilter();
+
+    });
 }
 
 /**
@@ -1142,6 +1450,660 @@ function formatDistance(distanceMeters) {
 
     return `${distanceKilometers.toFixed(1)} km`;
 }
+
+
+/**
+ * Calcula la recomendación inteligente cuando ya existe
+ * una ubicación válida del usuario.
+ *
+ * Factores:
+ * 40% cercanía
+ * 30% disponibilidad
+ * 20% calificación
+ * 10% precio
+ */
+function calculateAndApplySmartRecommendation() {
+
+    const origin = searchLocation || userLocation;
+
+    if (!origin || parkingDataRegistry.size === 0) {
+        return;
+    }
+
+    const radiusMeters =
+            currentSearchRadius * 1000;
+
+    const candidates = Array.from(
+            parkingDataRegistry.values()
+            ).filter((parking) =>
+        hasValidCoordinates(parking)
+                && Number.isFinite(parking.distanceMeters)
+                && parking.distanceMeters <= radiusMeters
+                && parking.espacios > 0
+    );
+
+    /*
+     * Si todos están agotados o no tienen coordenadas,
+     * se conserva la recomendación inicial del backend.
+     */
+    if (candidates.length === 0) {
+
+        clearSmartRecommendation();
+
+        console.warn(`No existen parqueos disponibles dentro de ` + `${currentSearchRadius} km.`);
+
+        return;
+    }
+
+    const validPrices = candidates
+            .map((parking) => parking.precio)
+            .filter((price) => Number.isFinite(price) && price >= 0);
+
+    const minimumPrice = validPrices.length > 0
+            ? Math.min(...validPrices)
+            : 0;
+
+    const maximumPrice = validPrices.length > 0
+            ? Math.max(...validPrices)
+            : minimumPrice;
+
+    let recommendedParking = null;
+
+    parkingDataRegistry.forEach((parking) => {
+
+        parking.smartScore = null;
+        parking.scoreBreakdown = null;
+
+        if (!candidates.includes(parking)) {
+            return;
+        }
+
+        const proximityScore = calculateProximityScore(
+                parking.distanceMeters
+                );
+
+        const availabilityScore = calculateAvailabilityScore(
+                parking
+                );
+
+        const ratingScore = clamp(
+                (parking.calificacion / 5) * 100,
+                0,
+                100
+                );
+
+        const priceScore = calculatePriceScore(
+                parking.precio,
+                minimumPrice,
+                maximumPrice
+                );
+
+        const smartScore =
+                proximityScore * SMART_SCORE_WEIGHTS.proximity
+                + availabilityScore * SMART_SCORE_WEIGHTS.availability
+                + ratingScore * SMART_SCORE_WEIGHTS.rating
+                + priceScore * SMART_SCORE_WEIGHTS.price;
+
+        parking.smartScore = Math.round(smartScore * 10) / 10;
+
+        parking.scoreBreakdown = {
+            proximity: Math.round(proximityScore),
+            availability: Math.round(availabilityScore),
+            rating: Math.round(ratingScore),
+            price: Math.round(priceScore)
+        };
+
+        if (!recommendedParking
+                || parking.smartScore > recommendedParking.smartScore
+                || (
+                        parking.smartScore === recommendedParking.smartScore
+                        && parking.distanceMeters
+                        < recommendedParking.distanceMeters
+                        )) {
+
+            recommendedParking = parking;
+        }
+    });
+
+    if (!recommendedParking) {
+        return;
+    }
+
+    applyRecommendedParking(recommendedParking.id);
+    sortParkingCardsBySmartScore();
+
+    console.table(
+            Array.from(parkingDataRegistry.values())
+            .filter((parking) =>
+                Number.isFinite(parking.smartScore)
+            )
+            .map((parking) => ({
+                    parqueo: parking.nombre,
+                    distancia: formatDistance(parking.distanceMeters),
+                    espacios: parking.espacios,
+                    precio: parking.precio,
+                    calificacion: parking.calificacion,
+                    smartScore: parking.smartScore
+                }))
+            );
+}
+
+/**
+ * Limpia la recomendación cuando no existen
+ * parqueos disponibles dentro del radio.
+ */
+function clearSmartRecommendation() {
+
+    parkingDataRegistry.forEach(
+            (parking, parkingId) => {
+
+        parking.mejor = false;
+        parking.smartScore = null;
+        parking.scoreBreakdown = null;
+
+        updateRecommendedCard(
+                parkingId,
+                false
+                );
+
+        updateParkingMarkerStyle(
+                parkingId,
+                parking
+                );
+
+        refreshParkingInfoWindow(
+                parkingId,
+                parking
+                );
+    });
+
+    const assistant = document.getElementById(
+            "easyBotRecommendation"
+            );
+
+    const parkingName = document.getElementById(
+            "easyBotParkingName"
+            );
+
+    const reason = document.getElementById(
+            "easyBotReason"
+            );
+
+    const reserveLink = document.getElementById(
+            "easyBotReserveLink"
+            );
+
+    const locationName = getCurrentSearchLocationName();
+
+    if (assistant) {
+        assistant.classList.add("no-results");
+    }
+
+    if (parkingName) {
+        parkingName.textContent =
+                "No encontré opciones disponibles";
+    }
+
+    if (reason) {
+
+        reason.textContent =
+                ` dentro de ${currentSearchRadius} km`
+                + ` de ${locationName}. Prueba ampliando`
+                + ` el radio o cambiando la ubicación.`;
+    }
+
+    if (reserveLink) {
+        reserveLink.style.display = "none";
+    }
+}
+
+/**
+ * Devuelve un nombre comprensible para
+ * el origen actual de la búsqueda.
+ */
+function getCurrentSearchLocationName() {
+
+    if (searchLocation?.label) {
+        return searchLocation.label;
+    }
+
+    if (userLocation) {
+        return "tu ubicación actual";
+    }
+
+    return "la ubicación seleccionada";
+}
+
+/**
+ * Convierte la distancia en una puntuación de 0 a 100.
+ * Utiliza una caída exponencial para evitar que un parqueo
+ * de otra provincia gane solamente por tener más espacios.
+ */
+function calculateProximityScore(distanceMeters) {
+
+    if (!Number.isFinite(distanceMeters) || distanceMeters < 0) {
+        return 0;
+    }
+
+    const distanceKilometers = distanceMeters / 1000;
+
+    return clamp(
+            100 * Math.exp(
+                    -distanceKilometers / PROXIMITY_DECAY_KM
+                    ),
+            0,
+            100
+            );
+}
+
+/**
+ * Calcula el porcentaje real de espacios disponibles.
+ * Cuando no existe un total válido, usa una escala
+ * conservadora basada en espacios absolutos.
+ */
+function calculateAvailabilityScore(parking) {
+
+    if (parking.espacios <= 0) {
+        return 0;
+    }
+
+    if (parking.espaciosTotales > 0) {
+
+        return clamp(
+                (parking.espacios / parking.espaciosTotales) * 100,
+                0,
+                100
+                );
+    }
+
+    return clamp(
+            parking.espacios * 5,
+            0,
+            100
+            );
+}
+
+/**
+ * El parqueo más económico recibe 100 puntos y el más caro 0.
+ * Si todos tienen el mismo precio, todos reciben 100.
+ */
+function calculatePriceScore(
+        price,
+        minimumPrice,
+        maximumPrice
+        ) {
+
+    if (!Number.isFinite(price) || price < 0) {
+        return 0;
+    }
+
+    if (maximumPrice <= minimumPrice) {
+        return 100;
+    }
+
+    return clamp(
+            100
+            - (
+                    (price - minimumPrice)
+                    / (maximumPrice - minimumPrice)
+                    * 100
+                    ),
+            0,
+            100
+            );
+}
+
+/**
+ * Aplica visualmente la nueva recomendación:
+ * tarjeta, badge, marcador, popup y EasyBot.
+ */
+function applyRecommendedParking(recommendedParkingId) {
+
+    const recommendedId = String(recommendedParkingId);
+
+    parkingDataRegistry.forEach((parking, parkingId) => {
+
+        const isRecommended = parkingId === recommendedId;
+
+        parking.mejor = isRecommended;
+
+        updateRecommendedCard(
+                parkingId,
+                isRecommended
+                );
+
+        updateParkingMarkerStyle(
+                parkingId,
+                parking
+                );
+
+        refreshParkingInfoWindow(
+                parkingId,
+                parking
+                );
+    });
+
+    const recommendedParking = parkingDataRegistry.get(
+            recommendedId
+            );
+
+    if (!recommendedParking) {
+        return;
+    }
+
+    updateEasyBotRecommendation(
+            recommendedParking
+            );
+
+    updateRecommendedPrice(
+            recommendedParking
+            );
+
+    highlightCard(
+            recommendedId
+            );
+}
+
+/**
+ * Agrega o elimina el badge de "Mejor opción"
+ * de una tarjeta.
+ */
+function updateRecommendedCard(
+        parkingId,
+        isRecommended
+        ) {
+
+    const card = findParkingCard(parkingId);
+
+    if (!card) {
+        return;
+    }
+
+    card.classList.toggle(
+            "recommended",
+            isRecommended
+            );
+
+    let badge = card.querySelector(
+            ".recommended-badge"
+            );
+
+    if (isRecommended && !badge) {
+
+        badge = document.createElement("span");
+        badge.className = "recommended-badge";
+        badge.textContent = "Mejor opción";
+
+        const imageContainer = card.querySelector(
+                ".parking-card-image"
+                );
+
+        if (imageContainer) {
+            imageContainer.insertAdjacentElement(
+                    "afterend",
+                    badge
+                    );
+        } else {
+            card.prepend(badge);
+        }
+    }
+
+    if (!isRecommended && badge) {
+        badge.remove();
+    }
+}
+
+/**
+ * Actualiza el pin del mapa al cambiar la recomendación.
+ */
+function updateParkingMarkerStyle(
+        parkingId,
+        parking
+        ) {
+
+    const marker = markerRegistry.get(
+            String(parkingId)
+            );
+
+    if (!marker || !PinElementClass) {
+        return;
+    }
+
+    const pin = createParkingPin(parking);
+
+    marker.content = pin.element;
+    marker.zIndex = parking.mejor ? 500 : null;
+}
+
+/**
+ * Crea el pin de un parqueo respetando su estado recomendado.
+ */
+function createParkingPin(parking) {
+
+    return new PinElementClass({
+        background: parking.mejor
+                ? "#22c55e"
+                : "#0ea5e9",
+
+        borderColor: parking.mejor
+                ? "#15803d"
+                : "#0284c7",
+
+        glyphColor: "#ffffff",
+        glyph: parking.mejor ? "★" : "P",
+        scale: parking.mejor ? 1.25 : 1
+    });
+}
+
+/**
+ * Actualiza el mensaje contextual y el enlace
+ * de reserva del asistente EasyBot.
+ */
+function updateEasyBotRecommendation(parking) {
+
+    const assistant = document.getElementById(
+            "easyBotRecommendation"
+            );
+
+    const parkingName = document.getElementById(
+            "easyBotParkingName"
+            );
+
+    const reason = document.getElementById(
+            "easyBotReason"
+            );
+
+    const reserveLink = document.getElementById(
+            "easyBotReserveLink"
+            );
+
+    if (!assistant || !parking) {
+        return;
+    }
+
+    assistant.classList.remove("no-results");
+
+    const visibleParkings =
+            Array.from(
+                    parkingDataRegistry.values()
+                    ).filter((item) =>
+        Number.isFinite(item.distanceMeters)
+                && item.distanceMeters
+                <= currentSearchRadius * 1000
+    );
+
+    const availableParkings =
+            visibleParkings.filter(
+                    (item) => item.espacios > 0
+            );
+
+    const locationName =
+            getCurrentSearchLocationName();
+
+    const distance =
+            formatDistance(
+                    parking.distanceMeters
+                    );
+
+    const rating =
+            Number(
+                    parking.calificacion || 0
+                    ).toFixed(1);
+
+    const smartScore =
+            Number.isFinite(parking.smartScore)
+            ? parking.smartScore.toFixed(1)
+            : "--";
+
+    if (parkingName) {
+        parkingName.textContent = parking.nombre;
+    }
+
+    if (reason) {
+
+        const resultsText =
+                availableParkings.length === 1
+                ? "Encontré 1 parqueo disponible"
+                : `Encontré ${availableParkings.length} `
+                + "parqueos disponibles";
+
+        reason.textContent =
+                `. ${resultsText} dentro de `
+                + `${currentSearchRadius} km de ${locationName}. `
+                + `Esta es la mejor opción porque está a ${distance}, `
+                + `tiene ${parking.espacios} espacios disponibles, `
+                + `una calificación de ${rating}★, una tarifa de `
+                + `₡${formatNumber(parking.precio)} por hora `
+                + `y un Smart Score de ${smartScore} puntos.`;
+    }
+
+    if (reserveLink) {
+
+        reserveLink.href =
+                createReservationUrl(
+                        parking.id
+                        );
+
+        reserveLink.style.display = "";
+    }
+
+    assistant.dataset.recommendedParkingId =
+            String(parking.id);
+}
+
+/**
+ * Actualiza la cifra de la tarjeta superior.
+ */
+function updateRecommendedPrice(parking) {
+
+    const priceElement = document.getElementById(
+            "recommendedParkingPrice"
+            );
+
+    if (!priceElement) {
+        return;
+    }
+
+    priceElement.textContent =
+            `₡${formatNumber(parking.precio)}`;
+}
+
+/**
+ * Ordena las tarjetas de mayor a menor Smart Score.
+ * Las tarjetas sin puntaje quedan al final.
+ */
+function sortParkingCardsBySmartScore() {
+
+    const resultsList = document.querySelector(
+            ".results-list"
+            );
+
+    if (!resultsList) {
+        return;
+    }
+
+    const cards = Array.from(
+            resultsList.querySelectorAll(
+                    ".parking-card"
+                    )
+            );
+
+    cards.sort((cardA, cardB) => {
+
+        const parkingA = parkingDataRegistry.get(
+                getParkingIdFromCard(cardA)
+                );
+
+        const parkingB = parkingDataRegistry.get(
+                getParkingIdFromCard(cardB)
+                );
+
+        const scoreA = parkingA?.smartScore
+                ?? Number.NEGATIVE_INFINITY;
+
+        const scoreB = parkingB?.smartScore
+                ?? Number.NEGATIVE_INFINITY;
+
+        if (scoreA !== scoreB) {
+            return scoreB - scoreA;
+        }
+
+        const distanceA = parkingA?.distanceMeters
+                ?? Number.POSITIVE_INFINITY;
+
+        const distanceB = parkingB?.distanceMeters
+                ?? Number.POSITIVE_INFINITY;
+
+        return distanceA - distanceB;
+    });
+
+    cards.forEach((card, index) => {
+
+        resultsList.appendChild(card);
+
+        card.dataset.smartPosition =
+                String(index + 1);
+    });
+}
+
+/**
+ * Localiza una tarjeta por el ID de parqueo.
+ */
+function findParkingCard(parkingId) {
+
+    const escapedId = CSS.escape(
+            String(parkingId)
+            );
+
+    return document.querySelector(
+            `.parking-card[data-parking-id="${escapedId}"],
+             .parking-card[data-parqueo-card="${escapedId}"]`
+            );
+}
+
+/**
+ * Limita un número a un intervalo.
+ */
+function clamp(value, minimum, maximum) {
+
+    return Math.min(
+            maximum,
+            Math.max(minimum, value)
+            );
+}
+
+/**
+ * Convierte un valor a número finito.
+ */
+function toFiniteNumber(value, fallback = 0) {
+
+    const numericValue = Number(value);
+
+    return Number.isFinite(numericValue)
+            ? numericValue
+            : fallback;
+}
+
 
 /**
  * Ordena las tarjetas visualmente desde el
@@ -1783,6 +2745,457 @@ function escapeHtml(value) {
 }
 
 /**
+ * Configura Google Places Autocomplete sobre el buscador.
+ *
+ * Características:
+ * - Restringe las sugerencias a Costa Rica.
+ * - Prioriza resultados del Valle Central.
+ * - Obtiene las coordenadas exactas del lugar seleccionado.
+ */
+function initializePlacesAutocomplete() {
+
+    const input = document.getElementById(
+            "locationSearchInput"
+            );
+
+    if (!input) {
+
+        console.warn(
+                "No se encontró el campo #locationSearchInput."
+                );
+
+        return;
+    }
+
+    if (!AutocompleteClass) {
+
+        console.warn(
+                "Google Places todavía no está disponible."
+                );
+
+        return;
+    }
+
+    /*
+     * Límites aproximados del Valle Central.
+     *
+     * No se utiliza strictBounds porque queremos
+     * priorizar esta zona, pero seguir permitiendo
+     * búsquedas en todo Costa Rica.
+     */
+    const valleCentralBounds =
+            new google.maps.LatLngBounds(
+                    {
+                        lat: 9.70,
+                        lng: -84.35
+                    },
+                    {
+                        lat: 10.20,
+                        lng: -83.75
+                    }
+            );
+
+    placesAutocomplete =
+            new AutocompleteClass(
+                    input,
+                    {
+                        bounds: valleCentralBounds,
+
+                        /*
+                         * false significa que el Valle Central
+                         * será una preferencia y no una
+                         * restricción absoluta.
+                         */
+                        strictBounds: false,
+
+                        /*
+                         * Solo aparecen lugares ubicados
+                         * dentro de Costa Rica.
+                         */
+                        componentRestrictions: {
+                            country: "cr"
+                        },
+
+                        /*
+                         * Solicitamos únicamente los datos
+                         * que EasySpot realmente necesita.
+                         */
+                        fields: [
+                            "place_id",
+                            "name",
+                            "formatted_address",
+                            "geometry"
+                        ]
+                    }
+            );
+
+    placesAutocomplete.addListener(
+            "place_changed",
+            handleAutocompletePlaceSelected
+            );
+
+    /*
+     * Si el usuario modifica manualmente el texto después
+     * de seleccionar una sugerencia, invalidamos la
+     * selección anterior.
+     */
+    input.addEventListener("input", () => {
+
+        placeSelectedFromAutocomplete = false;
+
+    });
+}
+
+/**
+ * Procesa el lugar seleccionado en las sugerencias
+ * de Google Places Autocomplete.
+ */
+function handleAutocompletePlaceSelected() {
+
+    if (!placesAutocomplete) {
+        return;
+    }
+
+    const place = placesAutocomplete.getPlace();
+
+    if (!place?.geometry?.location) {
+
+        placeSelectedFromAutocomplete = false;
+
+        showSearchLocationMessage(
+                "Selecciona una ubicación de la lista de sugerencias.",
+                true
+                );
+
+        return;
+    }
+
+    const latitude =
+            place.geometry.location.lat();
+
+    const longitude =
+            place.geometry.location.lng();
+
+    const label =
+            place.formatted_address
+            || place.name
+            || "Ubicación seleccionada";
+
+    searchLocation = {
+        lat: latitude,
+        lng: longitude,
+        label: label,
+        placeId: place.place_id || null
+    };
+
+    placeSelectedFromAutocomplete = true;
+
+    const input = document.getElementById(
+            "locationSearchInput"
+            );
+
+    /*
+     * Conservamos un nombre entendible en el formulario.
+     * Este valor seguirá viajando al backend como q.
+     */
+    if (input) {
+
+        input.value =
+                place.name
+                || place.formatted_address
+                || input.value;
+    }
+
+    createOrUpdateSearchLocationMarker();
+
+    updateParkingDistances();
+
+    calculateAndApplySmartRecommendation();
+
+    map.panTo({
+        lat: latitude,
+        lng: longitude
+    });
+
+    map.setZoom(15);
+
+    showSearchLocationMessage(
+            `Ubicación seleccionada: ${label}.`
+            );
+}
+
+/**
+ * Convierte una ubicación escrita por el usuario
+ * en coordenadas mediante Google Geocoding.
+ */
+async function geocodeSearchLocation(searchText) {
+
+    if (!GeocoderClass) {
+        throw new Error(
+                "El servicio de geocodificación todavía no está disponible."
+                );
+    }
+
+    const geocoder = new GeocoderClass();
+
+    const response = await geocoder.geocode({
+        address: searchText,
+        componentRestrictions: {
+            country: "CR"
+        }
+    });
+
+    if (!response.results || response.results.length === 0) {
+        throw new Error(
+                "No encontramos esa ubicación en Costa Rica."
+                );
+    }
+
+    const result = response.results[0];
+    const position = result.geometry.location;
+
+    return {
+        lat: position.lat(),
+        lng: position.lng(),
+        label: result.formatted_address
+    };
+}
+
+/**
+ * Procesa la ubicación escrita en el buscador.
+ * Si el campo está vacío, utiliza la ubicación GPS.
+ */
+async function applyGeographicSearch() {
+
+    const input = document.getElementById(
+            "locationSearchInput"
+            );
+
+    const searchText = input?.value.trim() || "";
+
+    /*
+     * Si el usuario acaba de seleccionar una sugerencia de
+     * Places y todavía estamos en la misma carga de página,
+     * ya tenemos las coordenadas exactas.
+     */
+    if (placeSelectedFromAutocomplete && searchLocation) {
+
+        createOrUpdateSearchLocationMarker();
+
+        updateParkingDistances();
+
+        calculateAndApplySmartRecommendation();
+
+        map.panTo({
+            lat: searchLocation.lat,
+            lng: searchLocation.lng
+        });
+
+        map.setZoom(15);
+
+        showSearchLocationMessage(
+                `Mostrando parqueos cerca de ${searchLocation.label}.`
+                );
+
+        return;
+    }
+
+    if (!searchText) {
+
+        if (!userLocation) {
+            locateUser(true);
+            return;
+        }
+
+        searchLocation = null;
+
+        removeSearchLocationMarker();
+
+        updateParkingDistances();
+        calculateAndApplySmartRecommendation();
+
+        centerMapOnUser();
+
+        showSearchLocationMessage(
+                "Usando tu ubicación actual."
+                );
+
+        return;
+    }
+
+    setSearchButtonLoading(true);
+
+    try {
+
+        const result = await geocodeSearchLocation(
+                searchText
+                );
+
+        searchLocation = {
+            lat: result.lat,
+            lng: result.lng,
+            label: result.label
+        };
+
+        createOrUpdateSearchLocationMarker();
+
+        updateParkingDistances();
+
+        calculateAndApplySmartRecommendation();
+
+        map.panTo({
+            lat: searchLocation.lat,
+            lng: searchLocation.lng
+        });
+
+        map.setZoom(14);
+
+        showSearchLocationMessage(
+                `Mostrando parqueos cerca de ${result.label}.`
+                );
+
+    } catch (error) {
+
+        console.error(
+                "No se pudo procesar la ubicación:",
+                error
+                );
+
+        showSearchLocationMessage(
+                error.message || "No se pudo buscar la ubicación.",
+                true
+                );
+
+    } finally {
+
+        setSearchButtonLoading(false);
+    }
+}
+
+/**
+ * Crea un marcador para la ubicación buscada.
+ */
+function createOrUpdateSearchLocationMarker() {
+
+    if (!map
+            || !searchLocation
+            || !AdvancedMarkerElementClass
+            || !PinElementClass) {
+        return;
+    }
+
+    const position = {
+        lat: searchLocation.lat,
+        lng: searchLocation.lng
+    };
+
+    if (searchLocationMarker) {
+        searchLocationMarker.position = position;
+        return;
+    }
+
+    const pin = new PinElementClass({
+        background: "#f59e0b",
+        borderColor: "#d97706",
+        glyphColor: "#ffffff",
+        glyph: "●",
+        scale: 1.15
+    });
+
+    searchLocationMarker =
+            new AdvancedMarkerElementClass({
+                map: map,
+                position: position,
+                title: "Ubicación buscada",
+                content: pin.element,
+                zIndex: 2100
+            });
+}
+
+/**
+ * Elimina el marcador de la ubicación buscada.
+ */
+function removeSearchLocationMarker() {
+
+    if (!searchLocationMarker) {
+        return;
+    }
+
+    searchLocationMarker.map = null;
+    searchLocationMarker = null;
+}
+
+/**
+ * Muestra un mensaje indicando el origen de la búsqueda.
+ */
+function showSearchLocationMessage(
+        message,
+        isError = false
+        ) {
+
+    let element = document.getElementById(
+            "searchLocationMessage"
+            );
+
+    if (!element) {
+
+        element = document.createElement("div");
+        element.id = "searchLocationMessage";
+        element.className = "search-location-message";
+
+        const searchPanel = document.querySelector(
+                ".search-panel"
+                );
+
+        searchPanel?.insertAdjacentElement(
+                "afterend",
+                element
+                );
+    }
+
+    element.classList.toggle(
+            "error",
+            isError
+            );
+
+    element.innerHTML = `
+        <i class="fa-solid ${
+            isError
+            ? "fa-circle-exclamation"
+            : "fa-location-dot"
+            }"></i>
+
+        <span>${escapeHtml(message)}</span>
+    `;
+}
+
+/**
+ * Cambia temporalmente el estado del botón de búsqueda.
+ */
+function setSearchButtonLoading(isLoading) {
+
+    const button = document.querySelector(
+            ".search-btn"
+            );
+
+    if (!button) {
+        return;
+    }
+
+    button.disabled = isLoading;
+
+    button.innerHTML = isLoading
+            ? `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Buscando
+              `
+            : `
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Aplicar filtros
+              `;
+}
+
+/**
  * Crea la reservación a la hora de querer 
  * reservar desde el mapa de google
  */
@@ -1840,6 +3253,127 @@ function openParkingFromUrl() {
     }, 1200);
 
 }
+
+function connectRadiusSelector() {
+
+    const radios =
+            document.querySelectorAll(
+                    'input[name="searchRadius"]'
+                    );
+
+    radios.forEach((radio) => {
+
+        radio.addEventListener("change", () => {
+
+            currentSearchRadius =
+                    Number(radio.value);
+
+            applyRadiusFilter();
+
+        });
+
+    });
+
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    /*
+     * =====================================================
+     * BÚSQUEDA GEOGRÁFICA
+     * =====================================================
+     *
+     * El formulario se envía normalmente al backend.
+     * Spring aplica:
+     *
+     * - precio máximo
+     * - espacios mínimos
+     * - tipo de parqueo
+     * - fecha
+     * - horas
+     *
+     * Cuando el Dashboard vuelve a cargar, si existe una
+     * ubicación escrita en el campo q, JavaScript la
+     * convierte en coordenadas mediante Google Geocoding.
+     */
+
+    const locationInput = document.getElementById("locationSearchInput");
+
+    const searchForm = document.getElementById(
+            "parkingSearchForm"
+            );
+
+    if (searchForm && locationInput) {
+
+        searchForm.addEventListener("submit", () => {
+            /*
+             * Si no seleccionó una sugerencia, permitimos que
+             * el formulario continúe normalmente. Al recargar,
+             * EasySpot usará Geocoding como respaldo.
+             */
+            if (locationInput.value.trim() && !placeSelectedFromAutocomplete) {
+
+                console.info("No se seleccionó una sugerencia; se utilizará Geocoding.");
+            }
+        });
+    }
+
+    const hasSearchLocation =
+            Boolean(locationInput?.value.trim());
+
+    /*
+     * Google Maps se carga de forma asíncrona.
+     *
+     * Por eso no llamamos inmediatamente a
+     * applyGeographicSearch(), ya que todavía puede que:
+     *
+     * - el mapa no exista;
+     * - GeocoderClass no esté disponible;
+     * - los marcadores no estén registrados.
+     *
+     * initMap() será quien aplicará la búsqueda cuando
+     * Google Maps termine de cargar.
+     */
+    if (hasSearchLocation) {
+
+        document.body.dataset.pendingGeographicSearch =
+                "true";
+    }
+
+    /*
+     * =====================================================
+     * BOTONES DE RESERVA DE LAS TARJETAS
+     * =====================================================
+     *
+     * Se construye la URL usando la fecha y horas que
+     * estén actualmente escritas en los campos.
+     */
+
+    document.querySelectorAll(
+            ".reserve-link"
+            ).forEach((link) => {
+
+        link.addEventListener("click", (event) => {
+
+            event.preventDefault();
+
+            const parkingId = link.dataset.id;
+
+            if (!parkingId) {
+
+                console.warn(
+                        "El botón de reserva no tiene un ID de parqueo."
+                        );
+
+                return;
+            }
+
+            window.location.href =
+                    createReservationUrl(parkingId);
+        });
+    });
+
+});
 
 /*
  * Google Maps ejecutará esta función

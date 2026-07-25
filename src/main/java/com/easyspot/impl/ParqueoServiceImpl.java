@@ -143,4 +143,10 @@ public class ParqueoServiceImpl implements ParqueoService {
     public Parqueo guardar(Parqueo parqueo) {
         return parqueoRepository.save(parqueo);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Parqueo> obtenerParqueosActivos() {
+        return parqueoRepository.findByActivoTrueOrderByCalificacionDesc();
+    }
 }

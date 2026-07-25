@@ -78,7 +78,8 @@
                 <!-- BUSCADOR -->
                 <form th:action="@{/dashboard}"
                       method="get"
-                      class="search-panel">
+                      class="search-panel"
+                      id="parkingSearchForm">
 
                     <div class="search-grid">
 
@@ -91,9 +92,11 @@
                                 <i class="fa-solid fa-location-dot"></i>
 
                                 <input type="text"
+                                       id="locationSearchInput"
                                        name="q"
                                        th:value="${q}"
-                                       placeholder="La Sabana, San José">
+                                       placeholder="Busca un lugar o dirección"
+                                       autocomplete="off">
 
                             </div>
 
@@ -133,7 +136,7 @@
                                 class="search-btn">
 
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            Buscar
+                            Aplicar filtros
 
                         </button>
 
@@ -242,6 +245,56 @@
 
                     </div>
 
+                    <div class="radius-filter">
+
+                        <span class="radius-title">
+                            <i class="fa-solid fa-circle-dot"></i>
+                            Radio de búsqueda
+                        </span>
+
+                        <label>
+
+                            <input type="radio"
+                                   name="searchRadius"
+                                   value="2">
+
+                            <span>2 km</span>
+
+                        </label>
+
+                        <label>
+
+                            <input type="radio"
+                                   name="searchRadius"
+                                   value="5"
+                                   checked>
+
+                            <span>5 km</span>
+
+                        </label>
+
+                        <label>
+
+                            <input type="radio"
+                                   name="searchRadius"
+                                   value="10">
+
+                            <span>10 km</span>
+
+                        </label>
+
+                        <label>
+
+                            <input type="radio"
+                                   name="searchRadius"
+                                   value="20">
+
+                            <span>20 km</span>
+
+                        </label>
+
+                    </div>
+
                 </form>
 
                 <div class="dashboard-content-grid">
@@ -312,6 +365,7 @@
                                  th:data-longitud="${item.parqueo.longitud}"
                                  th:data-precio="${item.parqueo.tarifaHora}"
                                  th:data-espacios="${item.parqueo.espaciosDisponibles}"
+                                 th:data-espacios-totales="${item.parqueo.espaciosTotales}"
                                  th:data-calificacion="${item.parqueo.calificacion}"
                                  th:data-mejor="${item.mejorOpcion}">
                             </div>
@@ -347,7 +401,8 @@
                                         Mejor precio encontrado
                                     </small>
 
-                                    <strong th:if="${mejorParqueo != null}"
+                                    <strong id="recommendedParkingPrice"
+                                            th:if="${mejorParqueo != null}"
                                             th:text="'₡'
                                             + ${#numbers.formatDecimal(
                                             mejorParqueo.parqueo.tarifaHora,
@@ -417,7 +472,8 @@
 
                                 <h2>
 
-                                    <span th:text="${totalEspacios}">
+                                    <span id="visibleAvailableSpaces"
+                                          th:text="${totalEspacios}">
                                         27
                                     </span>
 
@@ -427,7 +483,8 @@
 
                             </div>
 
-                            <span class="result-count"
+                            <span id="visibleParkingCount"
+                                  class="result-count"
                                   th:text="${cantidadResultados + ' parqueos'}">
                                 4 parqueos
                             </span>
@@ -445,64 +502,36 @@
                                      ? ' recommended'
                                      : ''"
                                      th:data-parking-id="${item.parqueo.idParqueo}"
-                                     th:data-parqueo-card="${item.parqueo.idParqueo}">
+                                     th:data-parqueo-card="${item.parqueo.idParqueo}"
+                                     th:data-precio="${item.parqueo.tarifaHora}"
+                                     th:data-espacios="${item.parqueo.espaciosDisponibles}"
+                                     th:data-espacios-totales="${item.parqueo.espaciosTotales}"
+                                     th:data-calificacion="${item.parqueo.calificacion}">
 
-                                <!-- BOTÓN DE FAVORITOS -->
-                                <div class="parking-favorite-action">
+                                <!-- IMAGEN DEL PARQUEO -->
+                                <div class="parking-card-image">
 
-                                    <!-- AGREGAR A FAVORITOS -->
-                                    <form th:if="${favoritosIds == null
-                                          or !favoritosIds.contains(
-                                          item.parqueo.idParqueo
-                                          )}"
-                                          th:action="@{/favoritos/agregar/{idParqueo}(
-                                          idParqueo=${item.parqueo.idParqueo}
-                                          )}"
-                                          method="post"
-                                          class="favorite-toggle-form">
+                                    <img th:if="${item.parqueo.imagenUrl != null
+                                         and !#strings.isEmpty(item.parqueo.imagenUrl)}"
+                                         th:src="${item.parqueo.imagenUrl}"
+                                         th:alt="${item.parqueo.nombre}"
+                                         loading="lazy"
+                                         decoding="async">
 
-                                        <input type="hidden"
-                                               name="redirect"
-                                               value="/dashboard">
+                                    <!-- IMAGEN ALTERNATIVA -->
+                                    <div th:unless="${item.parqueo.imagenUrl != null
+                                         and !#strings.isEmpty(item.parqueo.imagenUrl)}"
+                                         class="parking-card-image-placeholder">
 
-                                        <button type="submit"
-                                                class="favorite-toggle-button"
-                                                title="Agregar a favoritos"
-                                                aria-label="Agregar a favoritos">
+                                        <i class="fa-solid fa-square-parking"></i>
 
-                                            <i class="fa-regular fa-heart"></i>
+                                        <span>Imagen no disponible</span>
 
-                                        </button>
-
-                                    </form>
-
-                                    <!-- QUITAR DE FAVORITOS -->
-                                    <form th:if="${favoritosIds != null
-                                          and favoritosIds.contains(
-                                          item.parqueo.idParqueo
-                                          )}"
-                                          th:action="@{/favoritos/eliminar/{idParqueo}(
-                                          idParqueo=${item.parqueo.idParqueo}
-                                          )}"
-                                          method="post"
-                                          class="favorite-toggle-form">
-
-                                        <input type="hidden"
-                                               name="redirect"
-                                               value="/dashboard">
-
-                                        <button type="submit"
-                                                class="favorite-toggle-button active"
-                                                title="Quitar de favoritos"
-                                                aria-label="Quitar de favoritos">
-
-                                            <i class="fa-solid fa-heart"></i>
-
-                                        </button>
-
-                                    </form>
+                                    </div>
 
                                 </div>
+
+
 
                                 <!-- MEJOR OPCIÓN -->
                                 <span th:if="${item.mejorOpcion}"
@@ -510,148 +539,203 @@
                                     Mejor opción
                                 </span>
 
-                                <div class="parking-card-top">
+                                <div class="parking-card-content">
 
-                                    <div class="parking-icon">
-                                        <i class="fa-solid fa-square-parking"></i>
-                                    </div>
+                                    <div class="parking-card-top">
 
-                                    <div class="parking-main-info">
+                                        <div class="parking-icon">
+                                            <i class="fa-solid fa-square-parking"></i>
+                                        </div>
 
-                                        <h3 th:text="${item.parqueo.nombre}">
-                                            Parqueo La Sabana
-                                        </h3>
+                                        <div class="parking-main-info">
 
-                                        <p>
+                                            <h3 th:text="${item.parqueo.nombre}">
+                                                Parqueo La Sabana
+                                            </h3>
 
-                                            <i class="fa-solid fa-location-dot"></i>
+                                            <p>
 
-                                            <span th:text="${item.parqueo.direccion}">
-                                                La Sabana
-                                            </span>
+                                                <i class="fa-solid fa-location-dot"></i>
 
-                                        </p>
+                                                <span th:text="${item.parqueo.direccion}">
+                                                    La Sabana
+                                                </span>
 
-                                        <div class="rating-row">
+                                            </p>
 
-                                            <i class="fa-solid fa-star"></i>
+                                            <div class="rating-row">
 
-                                            <strong th:text="${item.parqueo.calificacion != null
-                                                    ? item.parqueo.calificacion
-                                                    : '--'}">
-                                                4.8
+                                                <i class="fa-solid fa-star"></i>
+
+                                                <strong th:text="${item.parqueo.calificacion != null
+                                                        ? item.parqueo.calificacion
+                                                        : '--'}">
+                                                    4.8
+                                                </strong>
+
+                                                <span th:text="'('
+                                                      + ${item.parqueo.totalResenas != null
+                                                      ? item.parqueo.totalResenas
+                                                      : 0}
+                                                      + ' reseñas)'">
+                                                    (128 reseñas)
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="parking-price">
+
+                                            <strong th:text="'₡'
+                                                    + ${#numbers.formatDecimal(
+                                                    item.parqueo.tarifaHora,
+                                                    0,
+                                                    'COMMA',
+                                                    0,
+                                                    'POINT')}">
+                                                ₡600
                                             </strong>
 
-                                            <span th:text="'('
-                                                  + ${item.parqueo.totalResenas != null
-                                                  ? item.parqueo.totalResenas
-                                                  : 0}
-                                                  + ' reseñas)'">
-                                                (128 reseñas)
-                                            </span>
+                                            <span>por hora</span>
+
+                                        </div>
+                                        <!-- BOTÓN DE FAVORITOS -->
+                                        <div class="parking-favorite-action">
+
+                                            <!-- AGREGAR A FAVORITOS -->
+                                            <form th:if="${favoritosIds == null
+                                                  or !favoritosIds.contains(
+                                                  item.parqueo.idParqueo
+                                                  )}"
+                                                  th:action="@{/favoritos/agregar/{idParqueo}(
+                                                  idParqueo=${item.parqueo.idParqueo}
+                                                  )}"
+                                                  method="post"
+                                                  class="favorite-toggle-form">
+
+                                                <input type="hidden"
+                                                       name="redirect"
+                                                       value="/dashboard">
+
+                                                <button type="submit"
+                                                        class="favorite-toggle-button"
+                                                        title="Agregar a favoritos"
+                                                        aria-label="Agregar a favoritos">
+
+                                                    <i class="fa-regular fa-heart"></i>
+
+                                                </button>
+
+                                            </form>
+
+                                            <!-- QUITAR DE FAVORITOS -->
+                                            <form th:if="${favoritosIds != null
+                                                  and favoritosIds.contains(
+                                                  item.parqueo.idParqueo
+                                                  )}"
+                                                  th:action="@{/favoritos/eliminar/{idParqueo}(
+                                                  idParqueo=${item.parqueo.idParqueo}
+                                                  )}"
+                                                  method="post"
+                                                  class="favorite-toggle-form">
+
+                                                <input type="hidden"
+                                                       name="redirect"
+                                                       value="/dashboard">
+
+                                                <button type="submit"
+                                                        class="favorite-toggle-button active"
+                                                        title="Quitar de favoritos"
+                                                        aria-label="Quitar de favoritos">
+
+                                                    <i class="fa-solid fa-heart"></i>
+
+                                                </button>
+
+                                            </form>
 
                                         </div>
 
                                     </div>
 
-                                    <div class="parking-price">
+                                    <!-- SERVICIOS -->
+                                    <div class="parking-features">
 
-                                        <strong th:text="'₡'
-                                                + ${#numbers.formatDecimal(
-                                                item.parqueo.tarifaHora,
-                                                0,
-                                                'COMMA',
-                                                0,
-                                                'POINT')}">
-                                            ₡600
-                                        </strong>
+                                        <span th:if="${item.parqueo.techado}">
 
-                                        <span>por hora</span>
+                                            <i class="fa-solid fa-warehouse"></i>
+                                            Techado
+
+                                        </span>
+
+                                        <span th:if="${item.parqueo.seguridad24h}">
+
+                                            <i class="fa-solid fa-shield-halved"></i>
+                                            Seguridad 24/7
+
+                                        </span>
+
+                                        <span th:if="${item.parqueo.camaras}">
+
+                                            <i class="fa-solid fa-video"></i>
+                                            Cámaras
+
+                                        </span>
+
+                                        <span th:if="${item.parqueo.accesoDiscapacidad}">
+
+                                            <i class="fa-solid fa-wheelchair"></i>
+                                            Accesible
+
+                                        </span>
 
                                     </div>
 
-                                </div>
+                                    <!-- PIE DE TARJETA -->
+                                    <div class="parking-card-footer">
 
-                                <!-- SERVICIOS -->
-                                <div class="parking-features">
+                                        <div class="availability"
+                                             th:classappend="${item.nivelDisponibilidad}">
 
-                                    <span th:if="${item.parqueo.techado}">
+                                            <span class="availability-dot"></span>
 
-                                        <i class="fa-solid fa-warehouse"></i>
-                                        Techado
+                                            <div>
 
-                                    </span>
+                                                <strong th:text="${item.parqueo.espaciosDisponibles
+                                                        + ' espacios'}">
+                                                    15 espacios
+                                                </strong>
 
-                                    <span th:if="${item.parqueo.seguridad24h}">
+                                                <small th:text="${item.porcentajeOcupacion
+                                                       + '% ocupado'}">
+                                                    80% ocupado
+                                                </small>
 
-                                        <i class="fa-solid fa-shield-halved"></i>
-                                        Seguridad 24/7
-
-                                    </span>
-
-                                    <span th:if="${item.parqueo.camaras}">
-
-                                        <i class="fa-solid fa-video"></i>
-                                        Cámaras
-
-                                    </span>
-
-                                    <span th:if="${item.parqueo.accesoDiscapacidad}">
-
-                                        <i class="fa-solid fa-wheelchair"></i>
-                                        Accesible
-
-                                    </span>
-
-                                </div>
-
-                                <!-- PIE DE TARJETA -->
-                                <div class="parking-card-footer">
-
-                                    <div class="availability"
-                                         th:classappend="${item.nivelDisponibilidad}">
-
-                                        <span class="availability-dot"></span>
-
-                                        <div>
-
-                                            <strong th:text="${item.parqueo.espaciosDisponibles
-                                                    + ' espacios'}">
-                                                15 espacios
-                                            </strong>
-
-                                            <small th:text="${item.porcentajeOcupacion
-                                                   + '% ocupado'}">
-                                                80% ocupado
-                                            </small>
+                                            </div>
 
                                         </div>
 
+                                        <!-- RESERVAR -->
+                                        <a href="#"
+                                           class="reserve-btn reserve-link"
+                                           th:data-id="${item.parqueo.idParqueo}">
+
+                                            Reservar
+
+                                        </a>
+
+                                        <!-- AGOTADO -->
+                                        <button th:if="${item.parqueo.espaciosDisponibles == 0}"
+                                                type="button"
+                                                class="reserve-btn disabled"
+                                                disabled>
+
+                                            Agotado
+
+                                        </button>
+
                                     </div>
-
-                                    <!-- RESERVAR -->
-                                    <a th:if="${item.parqueo.espaciosDisponibles > 0}"
-                                       th:href="@{/reservas/nueva(
-                                       idParqueo=${item.parqueo.idParqueo},
-                                       fecha=${fechaSeleccionada},
-                                       horaInicio=${horaInicioSeleccionada},
-                                       horaSalida=${horaSalidaSeleccionada}
-                                       )}"
-                                       class="reserve-btn">
-
-                                        Reservar
-
-                                    </a>
-
-                                    <!-- AGOTADO -->
-                                    <button th:if="${item.parqueo.espaciosDisponibles == 0}"
-                                            type="button"
-                                            class="reserve-btn disabled"
-                                            disabled>
-
-                                        Agotado
-
-                                    </button>
 
                                 </div>
 
@@ -660,22 +744,29 @@
                         </div>
 
                         <!-- SIN RESULTADOS -->
-                        <div class="empty-results"
-                             th:if="${parqueos == null
-                             or #lists.isEmpty(parqueos)}">
+                        <!-- SIN RESULTADOS POR RADIO DE BÚSQUEDA -->
+                        <div id="dynamicEmptyResults"
+                             class="dynamic-empty-results"
+                             hidden>
 
-                            <i class="fa-solid fa-map-location-dot"></i>
+                            <div class="dynamic-empty-icon">
+                                <i class="fa-solid fa-location-crosshairs"></i>
+                            </div>
 
-                            <h3>No encontramos parqueos</h3>
+                            <h3>No hay parqueos en esta zona</h3>
 
-                            <p>
-                                Prueba con otra ubicación o elimina algunos
-                                filtros.
+                            <p id="dynamicEmptyMessage">
+                                No encontramos parqueos que cumplan con el radio seleccionado.
                             </p>
 
-                            <a th:href="@{/dashboard}">
-                                Mostrar todos
-                            </a>
+                            <button id="btnExpandSearchRadius"
+                                    type="button"
+                                    class="expand-radius-button">
+
+                                <i class="fa-solid fa-expand"></i>
+                                Ampliar búsqueda a 5 km
+
+                            </button>
 
                         </div>
 
@@ -684,7 +775,8 @@
                 </div>
 
                 <!-- ASISTENTE -->
-                <section class="assistant-card"
+                <section id="easyBotRecommendation"
+                         class="assistant-card"
                          th:if="${mejorParqueo != null}">
 
                     <div class="assistant-avatar">
@@ -702,14 +794,17 @@
 
                         <p>
 
-                            Te recomiendo
+                            Mi recomendación es
 
-                            <strong th:text="${mejorParqueo.parqueo.nombre}">
+                            <strong id="easyBotParkingName"
+                                    th:text="${mejorParqueo.parqueo.nombre}">
                                 Parqueo La Sabana
                             </strong>
 
-                            por su relación entre precio, disponibilidad,
-                            calificación y seguridad.
+                            <span id="easyBotReason">
+                                por su relación entre precio, disponibilidad,
+                                calificación y seguridad.
+                            </span>
 
                         </p>
 
@@ -721,6 +816,7 @@
                        horaInicio=${horaInicioSeleccionada},
                        horaSalida=${horaSalidaSeleccionada}
                        )}"
+                       id="easyBotReserveLink"
                        class="assistant-action">
 
                         Reservar mejor opción

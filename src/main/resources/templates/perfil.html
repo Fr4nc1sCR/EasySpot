@@ -1,15 +1,742 @@
 <!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
--->
-<html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{layout/fragmentos :: head(
+          'Mi perfil | EasySpot AI',
+          'perfil'
+          )}">
     </head>
+
     <body>
-        <div>TODO write content</div>
+
+        <div class="dashboard-shell">
+
+            <!-- Sidebar -->
+            <aside th:replace="~{layout/fragmentos :: sidebar('perfil')}">
+            </aside>
+
+            <!-- Contenido principal -->
+            <main class="profile-main">
+
+                <div class="profile-background" aria-hidden="true">
+                    <span class="profile-orb profile-orb-one"></span>
+                    <span class="profile-orb profile-orb-two"></span>
+                    <span class="profile-grid-background"></span>
+                </div>
+
+                <div class="profile-container">
+
+                    <!-- Encabezado -->
+                    <header class="profile-hero">
+
+                        <div class="profile-identity">
+
+                            <div class="profile-avatar">
+
+                                <span th:text="${usuario != null
+                                      and usuario.nombre != null
+                                      and !#strings.isEmpty(usuario.nombre)
+                                      ? #strings.substring(usuario.nombre, 0, 1)
+                                      : 'U'}">
+                                    U
+                                </span>
+
+                                <span class="profile-status-dot"></span>
+
+                            </div>
+
+                            <div class="profile-identity-content">
+
+                                <span class="profile-eyebrow">
+
+                                    <i class="fa-solid fa-user-shield"></i>
+                                    Cuenta personal
+
+                                </span>
+
+                                <h1 th:text="${usuario != null
+                                    ? usuario.nombre
+                                    : 'Usuario EasySpot'}">
+                                    Usuario EasySpot
+                                </h1>
+
+                                <p th:text="${usuario != null
+                                   ? usuario.email
+                                   : 'correo@easyspot.com'}">
+                                    correo@easyspot.com
+                                </p>
+
+                                <div class="profile-identity-badges">
+
+                                    <span>
+
+                                        <i class="fa-solid fa-id-badge"></i>
+
+                                        <span th:text="${usuario != null
+                                              and usuario.rol != null
+                                              ? usuario.rol.nombre
+                                              : 'USUARIO'}">
+                                            USUARIO
+                                        </span>
+
+                                    </span>
+
+                                    <span>
+
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        Cuenta activa
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="profile-hero-actions">
+
+                            <a href="#personalInformation"
+                               class="profile-primary-button">
+
+                                <i class="fa-solid fa-pen"></i>
+                                Editar perfil
+
+                            </a>
+
+                            <a th:href="@{/logout}"
+                               class="profile-secondary-button">
+
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                Cerrar sesión
+
+                            </a>
+
+                        </div>
+
+                    </header>
+
+                    <!-- Mensajes -->
+                    <section class="profile-alerts">
+
+                        <div class="profile-alert profile-alert-success"
+                             th:if="${session.perfilExito != null}">
+
+                            <i class="fa-solid fa-circle-check"></i>
+
+                            <div>
+                                <strong>Perfil actualizado</strong>
+                                <p th:text="${session.perfilExito}">
+                                    Los cambios fueron guardados.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="profile-alert profile-alert-error"
+                             th:if="${session.perfilError != null}">
+
+                            <i class="fa-solid fa-circle-exclamation"></i>
+
+                            <div>
+                                <strong>No fue posible actualizar el perfil</strong>
+                                <p th:text="${session.perfilError}">
+                                    Revisa la información ingresada.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="profile-alert profile-alert-success"
+                             th:if="${session.passwordExito != null}">
+
+                            <i class="fa-solid fa-shield-circle-check"></i>
+
+                            <div>
+                                <strong>Contraseña actualizada</strong>
+                                <p th:text="${session.passwordExito}">
+                                    La contraseña fue cambiada correctamente.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="profile-alert profile-alert-error"
+                             th:if="${session.passwordError != null}">
+
+                            <i class="fa-solid fa-lock"></i>
+
+                            <div>
+                                <strong>No fue posible cambiar la contraseña</strong>
+                                <p th:text="${session.passwordError}">
+                                    Revisa las contraseñas ingresadas.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <!-- Estadísticas -->
+                    <section class="profile-stats">
+
+                        <article class="profile-stat-card">
+
+                            <span class="profile-stat-icon profile-stat-icon-blue">
+                                <i class="fa-regular fa-calendar-check"></i>
+                            </span>
+
+                            <div>
+
+                                <strong th:text="${totalReservas != null
+                                        ? totalReservas
+                                        : 0}">
+                                    0
+                                </strong>
+
+                                <span>Reservas realizadas</span>
+
+                                <small>
+                                    Historial total de reservas.
+                                </small>
+
+                            </div>
+
+                        </article>
+
+                        <article class="profile-stat-card">
+
+                            <span class="profile-stat-icon profile-stat-icon-green">
+                                <i class="fa-solid fa-bolt"></i>
+                            </span>
+
+                            <div>
+
+                                <strong th:text="${reservasActivas != null
+                                        ? reservasActivas
+                                        : 0}">
+                                    0
+                                </strong>
+
+                                <span>Reservas activas</span>
+
+                                <small>
+                                    Reservas actualmente vigentes.
+                                </small>
+
+                            </div>
+
+                        </article>
+
+                        <article class="profile-stat-card">
+
+                            <span class="profile-stat-icon profile-stat-icon-red">
+                                <i class="fa-solid fa-heart"></i>
+                            </span>
+
+                            <div>
+
+                                <strong th:text="${totalFavoritos != null
+                                        ? totalFavoritos
+                                        : 0}">
+                                    0
+                                </strong>
+
+                                <span>Parqueos favoritos</span>
+
+                                <small>
+                                    Lugares guardados por el usuario.
+                                </small>
+
+                            </div>
+
+                        </article>
+
+                        <article class="profile-stat-card">
+
+                            <span class="profile-stat-icon profile-stat-icon-orange">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </span>
+
+                            <div>
+
+                                <strong th:text="${totalReportes != null
+                                        ? totalReportes
+                                        : 0}">
+                                    0
+                                </strong>
+
+                                <span>Reportes enviados</span>
+
+                                <small>
+                                    Aportes realizados a la comunidad.
+                                </small>
+
+                            </div>
+
+                        </article>
+
+                    </section>
+
+                    <!-- Contenido -->
+                    <section class="profile-content-grid">
+
+                        <div class="profile-main-column">
+
+                            <!-- Información personal -->
+                            <article class="profile-panel"
+                                     id="personalInformation">
+
+                                <div class="profile-panel-header">
+
+                                    <div>
+
+                                        <span class="profile-panel-icon">
+
+                                            <i class="fa-solid fa-address-card"></i>
+
+                                        </span>
+
+                                        <div>
+                                            <span>Datos de la cuenta</span>
+                                            <h2>Información personal</h2>
+                                        </div>
+
+                                    </div>
+
+                                    <span class="profile-panel-badge">
+                                        Editable
+                                    </span>
+
+                                </div>
+
+                                <form th:action="@{/perfil/actualizar}"
+                                      method="post"
+                                      class="profile-form">
+
+                                    <div class="profile-form-grid">
+
+                                        <label class="profile-field">
+
+                                            <span>
+                                                Nombre completo
+                                            </span>
+
+                                            <div class="profile-field-control">
+
+                                                <i class="fa-regular fa-user"></i>
+
+                                                <input type="text"
+                                                       name="nombre"
+                                                       maxlength="100"
+                                                       th:value="${usuario.nombre}"
+                                                       required>
+
+                                            </div>
+
+                                        </label>
+
+                                        <label class="profile-field">
+
+                                            <span>
+                                                Correo electrónico
+                                            </span>
+
+                                            <div class="profile-field-control">
+
+                                                <i class="fa-regular fa-envelope"></i>
+
+                                                <input type="email"
+                                                       name="email"
+                                                       maxlength="120"
+                                                       th:value="${usuario.email}"
+                                                       required>
+
+                                            </div>
+
+                                        </label>
+
+                                        <label class="profile-field">
+
+                                            <span>
+                                                Rol de la cuenta
+                                            </span>
+
+                                            <div class="profile-field-control profile-field-readonly">
+
+                                                <i class="fa-solid fa-user-tag"></i>
+
+                                                <input type="text"
+                                                       th:value="${usuario.rol != null
+                                                       ? usuario.rol.nombre
+                                                       : 'USUARIO'}"
+                                                       readonly>
+
+                                            </div>
+
+                                        </label>
+
+                                        <label class="profile-field">
+
+                                            <span>
+                                                Identificador del usuario
+                                            </span>
+
+                                            <div class="profile-field-control profile-field-readonly">
+
+                                                <i class="fa-solid fa-fingerprint"></i>
+
+                                                <input type="text"
+                                                       th:value="${'#USR-' + usuario.idUsuario}"
+                                                       readonly>
+
+                                            </div>
+
+                                        </label>
+
+                                    </div>
+
+                                    <div class="profile-form-actions">
+
+                                        <p>
+
+                                            <i class="fa-solid fa-circle-info"></i>
+
+                                            Mantén tus datos actualizados para
+                                            recibir información relacionada con
+                                            tus reservas.
+
+                                        </p>
+
+                                        <button type="submit"
+                                                class="profile-save-button">
+
+                                            <i class="fa-solid fa-floppy-disk"></i>
+                                            Guardar cambios
+
+                                        </button>
+
+                                    </div>
+
+                                </form>
+
+                            </article>
+
+                            <!-- Seguridad -->
+                            <article class="profile-panel">
+
+                                <div class="profile-panel-header">
+
+                                    <div>
+
+                                        <span class="profile-panel-icon profile-panel-icon-security">
+
+                                            <i class="fa-solid fa-shield-halved"></i>
+
+                                        </span>
+
+                                        <div>
+                                            <span>Protección de la cuenta</span>
+                                            <h2>Seguridad</h2>
+                                        </div>
+
+                                    </div>
+
+                                    <span class="profile-panel-badge profile-panel-badge-green">
+                                        Protegida
+                                    </span>
+
+                                </div>
+
+                                <form th:action="@{/perfil/password}"
+                                      method="post"
+                                      class="profile-form">
+
+                                    <div class="profile-form-grid">
+
+                                        <label class="profile-field profile-field-full">
+
+                                            <span>
+                                                Contraseña actual
+                                            </span>
+
+                                            <div class="profile-field-control">
+
+                                                <i class="fa-solid fa-lock"></i>
+
+                                                <input type="password"
+                                                       name="passwordActual"
+                                                       placeholder="Ingresa tu contraseña actual"
+                                                       required>
+
+                                            </div>
+
+                                        </label>
+
+                                        <label class="profile-field">
+
+                                            <span>
+                                                Nueva contraseña
+                                            </span>
+
+                                            <div class="profile-field-control">
+
+                                                <i class="fa-solid fa-key"></i>
+
+                                                <input type="password"
+                                                       name="passwordNueva"
+                                                       minlength="6"
+                                                       placeholder="Mínimo 6 caracteres"
+                                                       required>
+
+                                            </div>
+
+                                        </label>
+
+                                        <label class="profile-field">
+
+                                            <span>
+                                                Confirmar nueva contraseña
+                                            </span>
+
+                                            <div class="profile-field-control">
+
+                                                <i class="fa-solid fa-key"></i>
+
+                                                <input type="password"
+                                                       name="confirmacionPassword"
+                                                       minlength="6"
+                                                       placeholder="Repite la nueva contraseña"
+                                                       required>
+
+                                            </div>
+
+                                        </label>
+
+                                    </div>
+
+                                    <div class="profile-form-actions">
+
+                                        <p>
+
+                                            <i class="fa-solid fa-shield-heart"></i>
+
+                                            Utiliza una contraseña distinta a
+                                            la actual y evita compartirla.
+
+                                        </p>
+
+                                        <button type="submit"
+                                                class="profile-save-button profile-security-button">
+
+                                            <i class="fa-solid fa-shield"></i>
+                                            Cambiar contraseña
+
+                                        </button>
+
+                                    </div>
+
+                                </form>
+
+                            </article>
+
+                        </div>
+
+                        <!-- Columna lateral -->
+                        <aside class="profile-side-column">
+
+                            <!-- Estado de cuenta -->
+                            <article class="profile-side-card">
+
+                                <div class="profile-side-card-header">
+
+                                    <span class="profile-side-icon">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                    </span>
+
+                                    <div>
+                                        <span>Estado de la cuenta</span>
+                                        <h2>Cuenta activa</h2>
+                                    </div>
+
+                                </div>
+
+                                <div class="profile-account-status">
+
+                                    <div>
+
+                                        <span>Correo registrado</span>
+
+                                        <strong th:text="${usuario.email}">
+                                            correo@easyspot.com
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <span>Rol asignado</span>
+
+                                        <strong th:text="${usuario.rol != null
+                                                ? usuario.rol.nombre
+                                                : 'USUARIO'}">
+                                            USUARIO
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <span>Acceso al sistema</span>
+
+                                        <strong class="profile-status-success">
+                                            Autorizado
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <!-- Actividad reciente -->
+                            <article class="profile-side-card">
+
+                                <div class="profile-side-card-header">
+
+                                    <span class="profile-side-icon profile-side-icon-purple">
+                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                    </span>
+
+                                    <div>
+                                        <span>Resumen personal</span>
+                                        <h2>Actividad reciente</h2>
+                                    </div>
+
+                                </div>
+
+                                <div class="profile-activity-list">
+
+                                    <div class="profile-activity-item">
+
+                                        <span class="profile-activity-icon profile-activity-blue">
+                                            <i class="fa-regular fa-calendar-check"></i>
+                                        </span>
+
+                                        <div>
+                                            <strong>Últimas reservas</strong>
+                                            <small th:text="${ultimasReservas != null
+                                                   ? #lists.size(ultimasReservas)
+                                                   + ' registros recientes'
+                                                   : '0 registros recientes'}">
+                                                0 registros recientes
+                                            </small>
+                                        </div>
+
+                                        <a th:href="@{/reservas}"
+                                           aria-label="Ver reservas">
+
+                                            <i class="fa-solid fa-chevron-right"></i>
+
+                                        </a>
+
+                                    </div>
+
+                                    <div class="profile-activity-item">
+
+                                        <span class="profile-activity-icon profile-activity-red">
+                                            <i class="fa-solid fa-heart"></i>
+                                        </span>
+
+                                        <div>
+                                            <strong>Favoritos recientes</strong>
+                                            <small th:text="${ultimosFavoritos != null
+                                                   ? #lists.size(ultimosFavoritos)
+                                                   + ' registros recientes'
+                                                   : '0 registros recientes'}">
+                                                0 registros recientes
+                                            </small>
+                                        </div>
+
+                                        <a th:href="@{/favoritos}"
+                                           aria-label="Ver favoritos">
+
+                                            <i class="fa-solid fa-chevron-right"></i>
+
+                                        </a>
+
+                                    </div>
+
+                                    <div class="profile-activity-item">
+
+                                        <span class="profile-activity-icon profile-activity-orange">
+                                            <i class="fa-solid fa-triangle-exclamation"></i>
+                                        </span>
+
+                                        <div>
+                                            <strong>Reportes recientes</strong>
+                                            <small th:text="${ultimosReportes != null
+                                                   ? #lists.size(ultimosReportes)
+                                                   + ' registros recientes'
+                                                   : '0 registros recientes'}">
+                                                0 registros recientes
+                                            </small>
+                                        </div>
+
+                                        <a th:href="@{/reportes}"
+                                           aria-label="Ver reportes">
+
+                                            <i class="fa-solid fa-chevron-right"></i>
+
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <!-- Premium -->
+                            <article class="profile-premium-card">
+
+                                <span class="profile-premium-icon">
+                                    <i class="fa-solid fa-crown"></i>
+                                </span>
+
+                                <span>EasySpot Premium</span>
+
+                                <h2>
+                                    Más beneficios para tus reservas
+                                </h2>
+
+                                <p>
+                                    Obtén descuentos exclusivos, reservas
+                                    ilimitadas y una experiencia sin anuncios.
+                                </p>
+
+                                <a href="#">
+                                    Explorar Premium
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+
+                            </article>
+
+                        </aside>
+
+                    </section>
+
+                </div>
+
+            </main>
+
+        </div>
+
+        <div th:replace="~{layout/fragmentos :: scripts}">
+        </div>
+        
+        <script th:src="@{/js/perfil.js}"></script>
+
     </body>
+
 </html>
