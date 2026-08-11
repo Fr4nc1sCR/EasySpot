@@ -3285,102 +3285,76 @@ function connectRadiusSelector() {
 function initializeReservationDateTime() {
 
     const fechaInput =
-            document.querySelector(
-                    'input[name="fecha"]'
-                    );
+            document.querySelector('input[name="fecha"]');
 
     const horaInicioInput =
-            document.querySelector(
-                    'input[name="horaInicio"]'
-                    );
+            document.querySelector('input[name="horaInicio"]');
 
     const horaSalidaInput =
-            document.querySelector(
-                    'input[name="horaSalida"]'
-                    );
+            document.querySelector('input[name="horaSalida"]');
 
-    if (!fechaInput
-            || !horaInicioInput
-            || !horaSalidaInput) {
+    if (!fechaInput || !horaInicioInput || !horaSalidaInput) {
         return;
     }
 
-    /*
-     * Si la página trae parámetros explícitos
-     * en la URL, respetamos lo que escogió el usuario.
-     */
     const params =
-            new URLSearchParams(
-                    window.location.search
-                    );
+            new URLSearchParams(window.location.search);
 
-    const hasReservationParameters =
-            params.has("fecha")
-            || params.has("horaInicio")
-            || params.has("horaSalida");
-
-    if (hasReservationParameters) {
+    /*
+     * Si el usuario ya seleccionó horas
+     * y estas vienen en la URL, se respetan.
+     */
+    if (params.has("horaInicio")
+            || params.has("horaSalida")) {
         return;
     }
 
     const ahora = new Date();
 
-    /*
-     * Fecha local del dispositivo.
-     */
-    const year =
-            ahora.getFullYear();
+    const year = ahora.getFullYear();
 
     const month =
-            String(
-                    ahora.getMonth() + 1
-                    ).padStart(2, "0");
+            String(ahora.getMonth() + 1)
+                    .padStart(2, "0");
 
     const day =
-            String(
-                    ahora.getDate()
-                    ).padStart(2, "0");
+            String(ahora.getDate())
+                    .padStart(2, "0");
 
     fechaInput.value =
             `${year}-${month}-${day}`;
 
-    /*
-     * Hora actual.
-     */
-    const hours =
-            String(
-                    ahora.getHours()
-                    ).padStart(2, "0");
+    const horaInicio =
+            `${String(ahora.getHours()).padStart(2, "0")}:`
+            + `${String(ahora.getMinutes()).padStart(2, "0")}`;
 
-    const minutes =
-            String(
-                    ahora.getMinutes()
-                    ).padStart(2, "0");
-
-    horaInicioInput.value =
-            `${hours}:${minutes}`;
+    horaInicioInput.value = horaInicio;
 
     /*
-     * Salida una hora después.
+     * Salida = una hora después.
      */
     const salida =
             new Date(
                     ahora.getTime()
                     + 60 * 60 * 1000
-                    );
+            );
 
-    const exitHours =
-            String(
-                    salida.getHours()
-                    ).padStart(2, "0");
+    const horaSalida =
+            `${String(salida.getHours()).padStart(2, "0")}:`
+            + `${String(salida.getMinutes()).padStart(2, "0")}`;
 
-    const exitMinutes =
-            String(
-                    salida.getMinutes()
-                    ).padStart(2, "0");
+    /*
+     * Como el modelo actual no maneja fecha de salida,
+     * evitamos cruzar medianoche.
+     */
+    if (salida.getDate() !== ahora.getDate()) {
 
-    horaSalidaInput.value =
-            `${exitHours}:${exitMinutes}`;
+        horaSalidaInput.value = "23:59";
+
+    } else {
+
+        horaSalidaInput.value = horaSalida;
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {

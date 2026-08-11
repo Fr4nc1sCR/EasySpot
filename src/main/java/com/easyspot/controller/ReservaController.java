@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
+import java.time.ZoneId;
 
 /**
  *
@@ -113,9 +114,11 @@ public class ReservaController {
             return "redirect:/dashboard?sinEspacios";
         }
 
-        LocalDate hoy = LocalDate.now();
+        ZoneId zonaCostaRica = ZoneId.of("America/Costa_Rica");
 
-        LocalTime ahora = LocalTime.now().withSecond(0).withNano(0);
+        LocalDate hoy = LocalDate.now(zonaCostaRica);
+
+        LocalTime ahora = LocalTime.now(zonaCostaRica).withSecond(0).withNano(0);
 
         /*
          * No se permiten fechas anteriores a hoy.

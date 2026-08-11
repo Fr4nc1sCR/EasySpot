@@ -71,18 +71,6 @@ public class DashboardController {
             fecha = LocalDate.now();
         }
 
-        if (horaInicio == null) {
-
-            horaInicio = LocalTime.now()
-                    .withSecond(0)
-                    .withNano(0);
-        }
-
-        if (horaSalida == null) {
-
-            horaSalida = horaInicio.plusHours(1);
-        }
-
         /*
          * Se consultan los parqueos aplicando los filtros recibidos.
          */
