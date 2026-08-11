@@ -72,11 +72,15 @@ public class DashboardController {
         }
 
         if (horaInicio == null) {
-            horaInicio = LocalTime.of(8, 0);
+
+            horaInicio = LocalTime.now()
+                    .withSecond(0)
+                    .withNano(0);
         }
 
         if (horaSalida == null) {
-            horaSalida = LocalTime.of(9, 0);
+
+            horaSalida = horaInicio.plusHours(1);
         }
 
         /*
