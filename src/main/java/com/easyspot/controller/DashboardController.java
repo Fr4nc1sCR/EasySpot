@@ -68,7 +68,7 @@ public class DashboardController {
 
         // ===== AQUÍ VA =====
         if (fecha == null) {
-            fecha = LocalDate.now();
+            fecha = LocalDate.now(java.time.ZoneId.of("America/Costa_Rica"));
         }
 
         /*
