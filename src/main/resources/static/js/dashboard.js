@@ -3402,6 +3402,8 @@ function initializeReservationDateTime() {
     );
 }
 
+// Prueba
+
 document.addEventListener("DOMContentLoaded", () => {
     
     initializeReservationDateTime();
