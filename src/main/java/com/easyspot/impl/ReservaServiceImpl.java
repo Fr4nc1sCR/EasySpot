@@ -86,7 +86,7 @@ public class ReservaServiceImpl implements ReservaService {
         }
 
         reserva.setEstado(EstadoReserva.CANCELADA);
-        reserva.setFechaActualizacion(LocalDateTime.now());
+        reserva.setFechaActualizacion(LocalDateTime.now(ZoneId.of("America/Costa_Rica")));
 
         reservaRepository.save(reserva);
     }
@@ -157,7 +157,11 @@ public class ReservaServiceImpl implements ReservaService {
     @Transactional
     public void actualizarReservasCompletadas() {
 
-        LocalDateTime ahora = LocalDateTime.now();
+        ZoneId zonaCostaRica
+                = ZoneId.of("America/Costa_Rica");
+
+        LocalDateTime ahora
+                = LocalDateTime.now(zonaCostaRica);
 
         List<Reserva> reservasActivas
                 = reservaRepository.findByEstado(
