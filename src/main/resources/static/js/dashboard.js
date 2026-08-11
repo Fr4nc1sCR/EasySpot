@@ -3276,8 +3276,117 @@ function connectRadiusSelector() {
 
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+/**
+ * Coloca la fecha y hora actuales del dispositivo
+ * cuando el usuario entra por primera vez al Dashboard.
+ *
+ * Hora de salida = hora de entrada + 1 hora.
+ */
+function initializeReservationDateTime() {
 
+    const fechaInput =
+            document.querySelector(
+                    'input[name="fecha"]'
+                    );
+
+    const horaInicioInput =
+            document.querySelector(
+                    'input[name="horaInicio"]'
+                    );
+
+    const horaSalidaInput =
+            document.querySelector(
+                    'input[name="horaSalida"]'
+                    );
+
+    if (!fechaInput
+            || !horaInicioInput
+            || !horaSalidaInput) {
+        return;
+    }
+
+    /*
+     * Si la página trae parámetros explícitos
+     * en la URL, respetamos lo que escogió el usuario.
+     */
+    const params =
+            new URLSearchParams(
+                    window.location.search
+                    );
+
+    const hasReservationParameters =
+            params.has("fecha")
+            || params.has("horaInicio")
+            || params.has("horaSalida");
+
+    if (hasReservationParameters) {
+        return;
+    }
+
+    const ahora = new Date();
+
+    /*
+     * Fecha local del dispositivo.
+     */
+    const year =
+            ahora.getFullYear();
+
+    const month =
+            String(
+                    ahora.getMonth() + 1
+                    ).padStart(2, "0");
+
+    const day =
+            String(
+                    ahora.getDate()
+                    ).padStart(2, "0");
+
+    fechaInput.value =
+            `${year}-${month}-${day}`;
+
+    /*
+     * Hora actual.
+     */
+    const hours =
+            String(
+                    ahora.getHours()
+                    ).padStart(2, "0");
+
+    const minutes =
+            String(
+                    ahora.getMinutes()
+                    ).padStart(2, "0");
+
+    horaInicioInput.value =
+            `${hours}:${minutes}`;
+
+    /*
+     * Salida una hora después.
+     */
+    const salida =
+            new Date(
+                    ahora.getTime()
+                    + 60 * 60 * 1000
+                    );
+
+    const exitHours =
+            String(
+                    salida.getHours()
+                    ).padStart(2, "0");
+
+    const exitMinutes =
+            String(
+                    salida.getMinutes()
+                    ).padStart(2, "0");
+
+    horaSalidaInput.value =
+            `${exitHours}:${exitMinutes}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    
+    initializeReservationDateTime();
+    
     /*
      * =====================================================
      * BÚSQUEDA GEOGRÁFICA

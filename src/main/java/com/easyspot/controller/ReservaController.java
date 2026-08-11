@@ -60,11 +60,11 @@ public class ReservaController {
 
         List<Reserva> historial = reservaService.obtenerHistorial(usuario.getIdUsuario());
 
-        model.addAttribute("reservasActivas",reservasActivas);
-        model.addAttribute("historial",historial);
-        model.addAttribute("totalReservas",reservaService.contarReservas(usuario.getIdUsuario()));
-        model.addAttribute("reservasCanceladas",reservaService.contarReservasCanceladas(usuario.getIdUsuario()));
-        model.addAttribute("tiempoPromedio",reservaService.obtenerTiempoPromedio(usuario.getIdUsuario()));
+        model.addAttribute("reservasActivas", reservasActivas);
+        model.addAttribute("historial", historial);
+        model.addAttribute("totalReservas", reservaService.contarReservas(usuario.getIdUsuario()));
+        model.addAttribute("reservasCanceladas", reservaService.contarReservasCanceladas(usuario.getIdUsuario()));
+        model.addAttribute("tiempoPromedio", reservaService.obtenerTiempoPromedio(usuario.getIdUsuario()));
 
         return "reservas";
     }
@@ -113,10 +113,35 @@ public class ReservaController {
             return "redirect:/dashboard?sinEspacios";
         }
 
-        if (fecha.isBefore(LocalDate.now())) {
+        LocalDate hoy = LocalDate.now();
+
+        LocalTime ahora = LocalTime.now().withSecond(0).withNano(0);
+
+        /*
+         * No se permiten fechas anteriores a hoy.
+         */
+        if (fecha.isBefore(hoy)) {
             return "redirect:/dashboard?fechaInvalida";
         }
 
+        /*
+         * Se da un pequeño margen de un minuto
+         * para evitar rechazar una reserva por unos segundos.
+         */
+        LocalTime limite = ahora.minusMinutes(1);
+
+        /*
+         * Si la reserva es para hoy,
+         * la hora de inicio no puede haber pasado.
+         */
+        if (fecha.equals(hoy) && horaInicio.isBefore(limite)) {
+            return "redirect:/dashboard?horaPasada";
+        }
+
+        /*
+         * La hora de salida debe ser posterior
+         * a la hora de entrada.
+         */
         if (!horaSalida.isAfter(horaInicio)) {
             return "redirect:/dashboard?horarioInvalido";
         }
