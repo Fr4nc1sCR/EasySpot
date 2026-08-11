@@ -235,6 +235,132 @@ async function initMap() {
 }
 
 /**
+ * Coloca la fecha y hora actuales del dispositivo
+ * cuando el usuario entra por primera vez al Dashboard.
+ *
+ * Hora de salida = hora de entrada + 1 hora.
+ */
+function initializeReservationDateTime() {
+
+    const fechaInput =
+            document.querySelector('input[name="fecha"]');
+
+    const horaInicioInput =
+            document.querySelector('input[name="horaInicio"]');
+
+    const horaSalidaInput =
+            document.querySelector('input[name="horaSalida"]');
+
+    if (!fechaInput || !horaInicioInput || !horaSalidaInput) {
+        return;
+    }
+
+    const params =
+            new URLSearchParams(window.location.search);
+
+    /*
+     * Si existen horas REALES en la URL,
+     * significa que el usuario ya realizó una búsqueda
+     * con esas horas y debemos conservarlas.
+     */
+    const horaInicioParam =
+            params.get("horaInicio");
+
+    const horaSalidaParam =
+            params.get("horaSalida");
+
+    if (horaInicioParam && horaSalidaParam) {
+
+        horaInicioInput.value =
+                horaInicioParam;
+
+        horaSalidaInput.value =
+                horaSalidaParam;
+
+        return;
+    }
+
+    /*
+     * =====================================================
+     * FECHA Y HORA DEL DISPOSITIVO
+     * =====================================================
+     */
+
+    const ahora = new Date();
+
+    /*
+     * Fecha actual del dispositivo.
+     */
+    const year =
+            ahora.getFullYear();
+
+    const month =
+            String(
+                    ahora.getMonth() + 1
+                    ).padStart(2, "0");
+
+    const day =
+            String(
+                    ahora.getDate()
+                    ).padStart(2, "0");
+
+    fechaInput.value =
+            `${year}-${month}-${day}`;
+
+    /*
+     * Hora de entrada = hora actual del dispositivo.
+     */
+    const horaEntrada =
+            `${String(
+                    ahora.getHours()
+                    ).padStart(2, "0")}:${String(
+            ahora.getMinutes()
+            ).padStart(2, "0")}`;
+
+    horaInicioInput.value =
+            horaEntrada;
+
+    /*
+     * Hora de salida = una hora después.
+     */
+    const salida =
+            new Date(ahora);
+
+    salida.setHours(
+            salida.getHours() + 1
+            );
+
+    /*
+     * El modelo actual de EasySpot utiliza una sola fecha.
+     * Por eso evitamos que la reserva atraviese medianoche.
+     */
+    if (salida.getDate() !== ahora.getDate()) {
+
+        horaSalidaInput.value =
+                "23:59";
+
+    } else {
+
+        const horaSalida =
+                `${String(
+                        salida.getHours()
+                        ).padStart(2, "0")}:${String(
+                salida.getMinutes()
+                ).padStart(2, "0")}`;
+
+        horaSalidaInput.value =
+                horaSalida;
+    }
+
+    console.log(
+            "EasySpot - Horario inicial:",
+            horaInicioInput.value,
+            "→",
+            horaSalidaInput.value
+            );
+}
+
+/**
  * Convierte los atributos data-* del HTML
  * en un objeto JavaScript.
  */
@@ -3276,138 +3402,10 @@ function connectRadiusSelector() {
 
 }
 
-/**
- * Coloca la fecha y hora actuales del dispositivo
- * cuando el usuario entra por primera vez al Dashboard.
- *
- * Hora de salida = hora de entrada + 1 hora.
- */
-function initializeReservationDateTime() {
-
-    const fechaInput =
-            document.querySelector('input[name="fecha"]');
-
-    const horaInicioInput =
-            document.querySelector('input[name="horaInicio"]');
-
-    const horaSalidaInput =
-            document.querySelector('input[name="horaSalida"]');
-
-    if (!fechaInput || !horaInicioInput || !horaSalidaInput) {
-        return;
-    }
-
-    const params =
-            new URLSearchParams(window.location.search);
-
-    /*
-     * Si existen horas REALES en la URL,
-     * significa que el usuario ya realizó una búsqueda
-     * con esas horas y debemos conservarlas.
-     */
-    const horaInicioParam =
-            params.get("horaInicio");
-
-    const horaSalidaParam =
-            params.get("horaSalida");
-
-    if (horaInicioParam && horaSalidaParam) {
-
-        horaInicioInput.value =
-                horaInicioParam;
-
-        horaSalidaInput.value =
-                horaSalidaParam;
-
-        return;
-    }
-
-    /*
-     * =====================================================
-     * FECHA Y HORA DEL DISPOSITIVO
-     * =====================================================
-     */
-
-    const ahora = new Date();
-
-    /*
-     * Fecha actual del dispositivo.
-     */
-    const year =
-            ahora.getFullYear();
-
-    const month =
-            String(
-                    ahora.getMonth() + 1
-            ).padStart(2, "0");
-
-    const day =
-            String(
-                    ahora.getDate()
-            ).padStart(2, "0");
-
-    fechaInput.value =
-            `${year}-${month}-${day}`;
-
-    /*
-     * Hora de entrada = hora actual del dispositivo.
-     */
-    const horaEntrada =
-            `${String(
-                    ahora.getHours()
-            ).padStart(2, "0")}:${String(
-                    ahora.getMinutes()
-            ).padStart(2, "0")}`;
-
-    horaInicioInput.value =
-            horaEntrada;
-
-    /*
-     * Hora de salida = una hora después.
-     */
-    const salida =
-            new Date(ahora);
-
-    salida.setHours(
-            salida.getHours() + 1
-    );
-
-    /*
-     * El modelo actual de EasySpot utiliza una sola fecha.
-     * Por eso evitamos que la reserva atraviese medianoche.
-     */
-    if (salida.getDate() !== ahora.getDate()) {
-
-        horaSalidaInput.value =
-                "23:59";
-
-    } else {
-
-        const horaSalida =
-                `${String(
-                        salida.getHours()
-                ).padStart(2, "0")}:${String(
-                        salida.getMinutes()
-                ).padStart(2, "0")}`;
-
-        horaSalidaInput.value =
-                horaSalida;
-    }
-
-    console.log(
-            "EasySpot - Horario inicial:",
-            horaInicioInput.value,
-            "→",
-            horaSalidaInput.value
-    );
-}
-
-// Prueba
-
 document.addEventListener("DOMContentLoaded", () => {
-    
+
     initializeReservationDateTime();
-    
+
     /*
      * =====================================================
      * BÚSQUEDA GEOGRÁFICA

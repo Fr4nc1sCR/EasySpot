@@ -172,18 +172,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    if (params.has("horaPasada")) {
-        Swal.fire({
-            ...easySpotAlert,
-            icon: "error",
-            title: "Hora no válida",
-            text: "La hora de entrada seleccionada ya pasó. Elige una hora posterior a la hora actual.",
-            confirmButtonText: "Corregir hora"
-        }).then(() => {
-            limpiarParametros();
-        });
-    }
-
     if (params.has("horarioInvalido")) {
         Swal.fire({
             ...easySpotAlert,
@@ -217,6 +205,16 @@ document.addEventListener("DOMContentLoaded", () => {
             confirmButtonText: "Aceptar"
         });
     }
-    
-    // Prueba
+
+    if (params.has("horaPasada")) {
+        Swal.fire({
+            ...easySpotAlert,
+            icon: "error",
+            title: "Hora no válida",
+            text: "La hora de entrada seleccionada ya pasó. Elige una hora posterior a la hora actual.",
+            confirmButtonText: "Corregir hora"
+        }).then(() => {
+            limpiarParametros();
+        });
+    }
 });
