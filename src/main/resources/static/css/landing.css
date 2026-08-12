@@ -281,59 +281,188 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     color: #64748b;
 }
 
+/* =========================================================
+   TARJETAS FLOTANTES DEL HERO
+   ========================================================= */
+
 .floating-ai-card,
 .floating-reserve-card {
     position: absolute;
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    backdrop-filter: blur(18px);
-    border-radius: 1.5rem;
-    padding: 1.2rem;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    z-index: 5;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(8, 20, 38, 0.96),
+            rgba(10, 28, 48, 0.92)
+        );
+
+    border: 1px solid rgba(34, 211, 238, 0.22);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    border-radius: 1.4rem;
+
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.45),
+        0 0 30px rgba(34, 211, 238, 0.08);
 }
+
+
+/* =========================================================
+   TARJETA EASySPOT AI
+   ========================================================= */
 
 .floating-ai-card {
     top: 7%;
-    right: 0;
-    max-width: 250px;
+    right: -10px;
+
+    width: 255px;
+    padding: 1.4rem;
 }
 
-.floating-ai-card span {
-    color: #67e8f9;
-    font-weight: 950;
+
+/* Línea decorativa superior */
+
+.floating-ai-card::before {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    left: 1.4rem;
+
+    width: 55px;
+    height: 3px;
+
+    background: linear-gradient(
+        90deg,
+        #22d3ee,
+        #3b82f6
+    );
+
+    border-radius: 999px;
+
+    box-shadow:
+        0 0 15px rgba(34, 211, 238, 0.65);
 }
+
+
+/* EasySpot AI */
+
+.floating-ai-card span {
+    display: block;
+
+    color: #22d3ee;
+
+    font-size: 0.8rem;
+    font-weight: 900;
+
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+
+/* Score 94 */
 
 .floating-ai-card strong {
     display: block;
-    margin-top: 0.5rem;
+
+    margin-top: 0.65rem;
+
+    color: #ffffff;
+
     font-size: 2rem;
+    font-weight: 950;
+
+    line-height: 1;
 }
+
+
+/* Descripción */
 
 .floating-ai-card p {
-    color: #cbd5e1;
-    margin-top: 0.5rem;
+    margin-top: 0.8rem;
+
+    color: #94a3b8;
+
+    font-size: 0.92rem;
+    line-height: 1.5;
 }
+
+
+/* =========================================================
+   TARJETA RESERVA LISTA
+   ========================================================= */
 
 .floating-reserve-card {
-    left: 0;
+    left: -20px;
     bottom: 11%;
+
+    min-width: 245px;
+
     display: flex;
-    gap: 1rem;
     align-items: center;
+    gap: 1rem;
+
+    padding: 1.15rem 1.3rem;
+
+    border-color: rgba(34, 197, 94, 0.25);
+
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.45),
+        0 0 25px rgba(34, 197, 94, 0.08);
 }
 
-.floating-reserve-card i {
+
+/* Icono */
+
+.floating-reserve-card > i {
+    width: 46px;
+    height: 46px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: rgba(34, 197, 94, 0.14);
+
     color: #22c55e;
-    font-size: 2rem;
+
+    font-size: 1.35rem;
+
+    border: 1px solid rgba(34, 197, 94, 0.25);
+
+    box-shadow:
+        0 0 20px rgba(34, 197, 94, 0.12);
 }
+
+
+/* Texto principal */
 
 .floating-reserve-card strong {
     display: block;
+
+    color: #ffffff;
+
+    font-size: 0.95rem;
+    font-weight: 900;
 }
 
+
+/* Texto secundario */
+
 .floating-reserve-card span {
-    color: #cbd5e1;
-    font-size: 0.9rem;
+    display: block;
+
+    margin-top: 0.3rem;
+
+    color: #94a3b8;
+
+    font-size: 0.82rem;
 }
 
 .features-section {
